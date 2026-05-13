@@ -55,10 +55,11 @@ def main():
     bStopWords = sc.broadcast(stopwords)
 
     df = (spark.read
-          .option("header",    "true")
-          .option("quote",     '"')
-          .option("escape",    '"')
-          .option("multiLine", "true")
+          .option("header",          "true")
+          .option("enforceSchema",   "true")
+          .option("quote",           '"')
+          .option("escape",          '"')
+          .option("multiLine",       "true")
           .schema(movie_csv_schema())
           .csv(args.data_path))
 
@@ -69,7 +70,7 @@ def main():
 
     @udf(ArrayType(StringType()))
     def lemmatize_udf(text):
-        return plainTextToLemmas(text, bStopWords.value)
+        return plainTextToLemmas(("", text), bStopWords.value)[1]
 
     df = df.withColumn("features", lemmatize_udf(df["plot"]))
     df.cache()
