@@ -1,9 +1,17 @@
 import argparse
 import nltk
+import math
+import time
+
+from pyspark import RDD, SparkContext
 from pyspark.sql import SparkSession
+from pyspark.mllib.linalg import Vectors
+from pyspark.mllib.linalg.distributed import RowMatrix
+
 from nltk.corpus import stopwords as nltk_sw
 from nltk.stem import WordNetLemmatizer
 from nltk import sent_tokenize, word_tokenize
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -63,6 +71,59 @@ def plainTextToLemmas(title_text, stopwords):
                 lemmas.append(lemma)
     return title, lemmas
 
+def run_grid_search(spark: SparkSession, docTermFreqs: RDD, numDocs: int, tokenizer_label: str, sc: SparkContext):
+    grid_numFreqs = [5000, 10000, 20000]
+    grid_ks = [25, 100, 250]
+    print("\n=== Grid Search ===")
+    print(f"{'numFreq':>10}  {'k':>5}  {'tokenizer':>10}  {'time_s':>8}")
+    for nf in grid_numFreqs:
+        for ki in grid_ks:
+            _, _, _, _, elapsed = runLSA(docTermFreqs, nf, numDocs, ki, sc)
+            print(f"{nf:>10}  {ki:>5}  {tokenizer_label:>10}  {elapsed:>8.1f}")
+    spark.stop()
+    return
+
+def calculateTermFreqs(title_terms):
+    title, terms = title_terms
+    freq = {}
+    for t in terms:
+        freq[t] = freq.get(t, 0) + 1
+    return title, freq
+
+def buildRowVectors(docTermFreqs: RDD, bIdTerms, bIdfs):
+    return docTermFreqs.map(lambda x: x[1]).map(
+        lambda freq: Vectors.sparse(
+            len(bIdTerms.value),
+            [(bIdTerms.value[t], bIdfs.value[t] * freq[t] / sum(freq.values()))
+             for t in freq if t in bIdTerms.value]
+        )
+    )
+
+# Latent Semantyc Analysis
+def runLSA(docTermFreqs: RDD, numTerms: int, numDocs: int, k: int, sc: SparkContext):
+    t0 = time.time()
+    idfs, idTerms, termIds, bIdfs, bIdTerms = buildTfIdf(docTermFreqs, numTerms, numDocs, sc)
+    rowVectors = buildRowVectors(docTermFreqs, bIdTerms, bIdfs)
+    rowVectors.cache()
+    svd = RowMatrix(rowVectors).computeSVD(k, computeU=True)
+    elapsed = time.time() - t0
+    bIdfs.unpersist()
+    bIdTerms.unpersist()
+    return svd, idfs, idTerms, termIds, elapsed
+
+# Term Frequency - Inverse Document Frequency
+def buildTfIdf(docTermFreqs: RDD, numTerms: int, numDocs: int, sc: SparkContext):
+    docFreqs = (docTermFreqs
+                .flatMap(lambda x: x[1].keys())
+                .map(lambda t: (t, 1))
+                .reduceByKey(lambda a, b: a + b, numPartitions=24))
+    topDocFreqs = docFreqs.top(numTerms, key=lambda x: x[1])
+    idfs = {term: math.log(numDocs / count) for term, count in topDocFreqs}
+    idTerms = {term: i for i, (term, _) in enumerate(topDocFreqs)}
+    termIds = {v: k for k, v in idTerms.items()}
+    bIdfs = sc.broadcast(idfs)
+    bIdTerms = sc.broadcast(idTerms)
+    return idfs, idTerms, termIds, bIdfs, bIdTerms
 
 def main():
     update_nltk_stopwords()
@@ -92,6 +153,18 @@ def main():
         lemmatized = plainText.mapPartitions(
             lambda it: (plainTextToLemmas(x, bStopWords.value) for x in it)
         )
+
+    docTermFreqs = lemmatized.map(calculateTermFreqs)
+    docTermFreqs.cache()
+    docIds = (docTermFreqs
+              .map(lambda x: x[0])
+              .zipWithUniqueId()
+              .map(lambda x: (x[1], x[0]))
+              .collectAsMap())
+
+    if args.grid_search:
+        run_grid_search(spark)
+        return
 
 if __name__ == "__main__":
     main()
