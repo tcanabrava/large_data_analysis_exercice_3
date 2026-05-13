@@ -1,13 +1,16 @@
 
 import argparse
+import time
+
 from pyspark.sql import SparkSession
-from util import update_nltk_stopwords, plainTextToLemmas, calculateTermFreqs
+from util import update_nltk_stopwords, plainTextToLemmas, calculateTermFreqs, buildTfIdf, buildRowVectors, topDocsInTopConcepts, topTermsInTopConcepts
 
 from pyspark.sql.types import (ArrayType, StructType, StructField,
                                 IntegerType, StringType)
 
 from pyspark.sql.functions import udf
 from nltk.corpus import stopwords as nltk_sw
+from pyspark.mllib.linalg.distributed import RowMatrix
 
 def movie_csv_schema():
     return StructType([
@@ -72,3 +75,16 @@ def parse_args():
                .map(lambda x: (x[1], x[0]))
                .collectAsMap())
 
+    # ── SVD decomposition ────────────────────────────────────────────────
+    print(f"\nBuilding TF-IDF: numFreq={args.numFreq} ...")
+    t0 = time.time()
+    idfs, idTerms, termIds, bIdfs, bIdTerms = buildTfIdf(featureRDD, args.numFreq, numDocs, sc)
+    rowVectors = buildRowVectors(featureRDD, bIdTerms, bIdfs)
+    rowVectors.cache()
+    svd = RowMatrix(rowVectors).computeSVD(args.k, computeU=True)
+    elapsed = time.time() - t0
+    print(f"SVD (numFreq={args.numFreq}, k={args.k}) computed in {elapsed:.1f}s")
+
+    numConcepts = min(args.k, 25)
+    top_terms = topTermsInTopConcepts(svd, numConcepts, 25, termIds)
+    top_docs  = topDocsInTopConcepts(svd, numConcepts, 25, docMeta)

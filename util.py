@@ -3,6 +3,8 @@ from nltk.stem import WordNetLemmatizer
 from nltk import sent_tokenize, word_tokenize
 import nltk
 from pyspark import RDD, SparkContext
+from pyspark.mllib.linalg import Vectors, Matrix
+from pyspark.mllib.linalg.distributed import RowMatrix, SingularValueDecomposition
 
 import math
 import operator
@@ -70,3 +72,32 @@ def calculateTermFreqs(title_terms):
         freq[t] = freq.get(t, 0) + 1
     return title, freq
 
+
+def buildRowVectors(docTermFreqs: RDD, bIdTerms, bIdfs):
+    return docTermFreqs.map(lambda x: x[1]).map(
+        lambda freq: Vectors.sparse(
+            len(bIdTerms.value),
+            [(bIdTerms.value[t], bIdfs.value[t] * freq[t] / sum(freq.values()))
+             for t in freq if t in bIdTerms.value]
+        )
+    )
+
+def topTermsInTopConcepts(svd: SingularValueDecomposition[RowMatrix, Matrix], numConcepts: int, numTerms: int, termIds: dict[int, str]) -> list[list[tuple[str, float]]]:
+    v = svd.V
+    arr = v.toArray().T
+    result = []
+    for i in range(numConcepts):
+        weights = sorted([(arr[i][tid], tid) for tid in range(v.numRows)], reverse=True)
+        result.append([(termIds.get(tid, str(tid)), score) for score, tid in weights[:numTerms]])
+    return result
+
+
+def topDocsInTopConcepts(svd: SingularValueDecomposition[RowMatrix, Matrix], numConcepts: int, numDocs: int, docIds: dict[int, str]) -> list[list[tuple[str, float]]]:
+    result = []
+    for i in range(numConcepts):
+        weights = sorted(
+            svd.U.rows.map(lambda row: row.toArray()[i]).zipWithUniqueId().collect(),
+            key=lambda x: -x[0]
+        )
+        result.append([(docIds.get(did, str(did)), score) for score, did in weights[:numDocs]])
+    return result
