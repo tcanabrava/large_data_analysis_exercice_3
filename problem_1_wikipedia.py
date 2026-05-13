@@ -1,19 +1,25 @@
 import argparse
-import nltk
 import time
 
 from pyspark import RDD, SparkContext
 from pyspark.sql import SparkSession
-from pyspark.mllib.linalg import Matrix, Vectors, Matrices
+from pyspark.mllib.linalg import Matrix
 from pyspark.mllib.linalg.distributed import RowMatrix, SingularValueDecomposition
-
-import numpy as np
-
-from scipy.sparse import csr_matrix
 
 from nltk.corpus import stopwords as nltk_sw
 
-from util import lemmatize, buildTfIdf, update_nltk_stopwords, calculateTermFreqs, buildRowVectors
+from util import (
+    lemmatize,
+    buildTfIdf,
+    update_nltk_stopwords,
+    calculateTermFreqs,
+    buildRowVectors,
+    multiplyByDiagonalRowMatrix,
+    termsToQueryVector,
+    topDocsForTermQuery,
+    topDocsInTopConcepts,
+    topTermsInTopConcepts
+)
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -81,52 +87,6 @@ def runLSA(docTermFreqs: RDD, numTerms: int, numDocs: int, k: int, sc: SparkCont
     bIdfs.unpersist()
     bIdTerms.unpersist()
     return svd, idfs, idTerms, termIds, elapsed
-
-
-def topTermsInTopConcepts(svd: SingularValueDecomposition[RowMatrix, Matrix], numConcepts: int, numTerms: int, termIds: dict[int, str]) -> list[list[tuple[str, float]]]:
-    v = svd.V
-    arr = v.toArray().T
-    result = []
-    for i in range(numConcepts):
-        weights = sorted([(arr[i][tid], tid) for tid in range(v.numRows)], reverse=True)
-        result.append([(termIds.get(tid, str(tid)), score) for score, tid in weights[:numTerms]])
-    return result
-
-
-def topDocsInTopConcepts(svd: SingularValueDecomposition[RowMatrix, Matrix], numConcepts: int, numDocs: int, docIds: dict[int, str]) -> list[list[tuple[str, float]]]:
-    result = []
-    for i in range(numConcepts):
-        weights = sorted(
-            svd.U.rows.map(lambda row: row.toArray()[i]).zipWithUniqueId().collect(),
-            key=lambda x: -x[0]
-        )
-        result.append([(docIds.get(did, str(did)), score) for score, did in weights[:numDocs]])
-    return result
-
-def multiplyByDiagonalRowMatrix(mat, diag):
-    s_arr = diag.toArray()
-    return RowMatrix(mat.rows.map(lambda v: Vectors.dense(np.multiply(v.toArray(), s_arr))))
-
-
-def termsToQueryVector(terms, idTerms, idfs):
-    pairs = [(idTerms[t], idfs[t]) for t in terms if t in idTerms and t in idfs]
-    if not pairs:
-        return None
-    indices, values = zip(*pairs)
-    return csr_matrix((list(values), (list(indices), [0] * len(indices))),
-                      shape=(len(idTerms), 1))
-
-
-def topDocsForTermQuery(US, V, query, docIds, n=10):
-    concept_vec = np.dot(V.toArray().T, query.toarray()).flatten()
-    mat = Matrices.dense(len(concept_vec), 1, concept_vec)
-    scores = (US.multiply(mat)
-                .rows.zipWithUniqueId()
-                .map(lambda x: (x[0].toArray()[0], x[1]))
-                .collect())
-    top = sorted(scores, key=lambda x: -x[0])[:n]
-    return [(docIds.get(did, str(did)), score) for score, did in top]
-
 
 def main():
     update_nltk_stopwords()

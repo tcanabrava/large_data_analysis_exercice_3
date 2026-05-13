@@ -3,7 +3,18 @@ import argparse
 import time
 
 from pyspark.sql import SparkSession
-from util import update_nltk_stopwords, plainTextToLemmas, calculateTermFreqs, buildTfIdf, buildRowVectors, topDocsInTopConcepts, topTermsInTopConcepts
+from util import (
+    buildTfIdf,
+    update_nltk_stopwords,
+    calculateTermFreqs,
+    buildRowVectors,
+    multiplyByDiagonalRowMatrix,
+    termsToQueryVector,
+    topDocsForTermQuery,
+    plainTextToLemmas,
+    topTermsInTopConcepts,
+    topDocsInTopConcepts
+)
 
 from pyspark.sql.types import (ArrayType, StructType, StructField,
                                 IntegerType, StringType)
@@ -88,3 +99,42 @@ def parse_args():
     numConcepts = min(args.k, 25)
     top_terms = topTermsInTopConcepts(svd, numConcepts, 25, termIds)
     top_docs  = topDocsInTopConcepts(svd, numConcepts, 25, docMeta)
+
+
+    # ── (c + d) Print top terms and docs (with genres) ───────────────────────
+    print(f"\n=== Top-25 terms / docs (with top-5 genres) under top-{numConcepts} concepts ===")
+    for i, (terms, docs) in enumerate(zip(top_terms, top_docs)):
+        print(f"\nConcept {i + 1}:")
+        print("  Terms: " + ", ".join(t for t, _ in terms))
+        print("  Docs:")
+        for title, score, genres in docs[:5]:
+            print(f"    [{score:.4f}] {title!r}  genres: {genres}")
+
+    # ── (e) Keyword queries ──────────────────────────────────────────────────
+    US = multiplyByDiagonalRowMatrix(svd.U, svd.s)
+
+    queries = [
+        ["love", "romance", "wedding"],
+        ["war", "battle", "soldier"],
+        ["murder", "detective", "crime"],
+        ["space", "alien", "planet"],
+        ["horror", "ghost", "haunted"],
+        ["family", "father", "child"],
+        ["comedy", "funny", "joke"],
+        ["adventure", "treasure", "journey"],
+        ["vampire", "blood", "monster"],
+        ["robot", "artificial", "intelligence"],
+    ]
+
+    print("\n=== Movie Search Engine Queries ===")
+    for q in queries:
+        qvec = termsToQueryVector([t.lower() for t in q], idTerms, idfs)
+        if qvec is None:
+            print(f"Query {q}: no terms in vocabulary")
+            continue
+        results = topDocsForTermQuery(US, svd.V, qvec, docMeta, n=5)
+        print(f"\nQuery: {q}")
+        for rank, (title, score) in enumerate(results, 1):
+            print(f"  {rank}. [{score:.6f}] {title!r}")
+
+    spark.stop()

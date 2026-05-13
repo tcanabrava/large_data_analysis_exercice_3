@@ -3,8 +3,11 @@ from nltk.stem import WordNetLemmatizer
 from nltk import sent_tokenize, word_tokenize
 import nltk
 from pyspark import RDD, SparkContext
-from pyspark.mllib.linalg import Vectors, Matrix
+from pyspark.mllib.linalg import Vectors, Matrix, Matrices
 from pyspark.mllib.linalg.distributed import RowMatrix, SingularValueDecomposition
+import numpy as np
+
+from scipy.sparse import csr_matrix
 
 import math
 import operator
@@ -101,3 +104,27 @@ def topDocsInTopConcepts(svd: SingularValueDecomposition[RowMatrix, Matrix], num
         )
         result.append([(docIds.get(did, str(did)), score) for score, did in weights[:numDocs]])
     return result
+
+def multiplyByDiagonalRowMatrix(mat, diag):
+    s_arr = diag.toArray()
+    return RowMatrix(mat.rows.map(lambda v: Vectors.dense(np.multiply(v.toArray(), s_arr))))
+
+
+def termsToQueryVector(terms, idTerms, idfs):
+    pairs = [(idTerms[t], idfs[t]) for t in terms if t in idTerms and t in idfs]
+    if not pairs:
+        return None
+    indices, values = zip(*pairs)
+    return csr_matrix((list(values), (list(indices), [0] * len(indices))),
+                      shape=(len(idTerms), 1))
+
+
+def topDocsForTermQuery(US, V, query, docIds, n=10):
+    concept_vec = np.dot(V.toArray().T, query.toarray()).flatten()
+    mat = Matrices.dense(len(concept_vec), 1, concept_vec)
+    scores = (US.multiply(mat)
+                .rows.zipWithUniqueId()
+                .map(lambda x: (x[0].toArray()[0], x[1]))
+                .collect())
+    top = sorted(scores, key=lambda x: -x[0])[:n]
+    return [(docIds.get(did, str(did)), score) for score, did in top]
