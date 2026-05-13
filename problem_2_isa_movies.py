@@ -77,7 +77,7 @@ def main():
     df.select("title", "features").show(5, truncate=80)
 
     # Build per-document term-frequency dicts from features
-    featureRDD = df.rdd.map(lambda row: calculateTermFreqs(row.features))
+    featureRDD = df.rdd.map(lambda row: calculateTermFreqs((row.title, row.features)))
     featureRDD.cache()
 
     # Collect metadata (title + genres) keyed by row index
