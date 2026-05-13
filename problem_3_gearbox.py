@@ -68,7 +68,6 @@ def calculate_k_grids(args: argparse.Namespace, normData: pyspark.RDD[DenseVecto
         t0    = time.time()
         model = KMeans.train(normData, k,
                              maxIterations=20,
-                             runs=1,
                              initializationMode="k-means||")
         elapsed = time.time() - t0
 
@@ -99,6 +98,9 @@ def display_outliners(args: argparse.Namespace, all_outliers: dict):
 
 
 def saveVisualization(sample_points, out_dir):
+    if not sample_points:
+        return
+
     os.makedirs(out_dir, exist_ok=True)
     data_repr = repr([[float(x) for x in pt] for pt in sample_points])
 
@@ -107,7 +109,7 @@ def saveVisualization(sample_points, out_dir):
     n   = len(arr)
 
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-    fig.suptitle(f'Gearbox Sensor Readings — Normalized Sample (n={{n}})')
+    fig.suptitle(f'Gearbox Sensor Readings — Normalized Sample (n={n})')
 
     pairs = [(0, 1, 'Sensor 1', 'Sensor 2'),
             (0, 2, 'Sensor 1', 'Sensor 3'),
@@ -117,15 +119,14 @@ def saveVisualization(sample_points, out_dir):
         ax.scatter(arr[:, xi], arr[:, yi], s=1, alpha=0.3)
         ax.set_xlabel(xl)
         ax.set_ylabel(yl)
-        ax.set_title(f'{{xl}} vs {{yl}}')
+        ax.set_title(f'{xl} vs {yl}')
 
     plt.tight_layout()
     out = 'gearbox_sample.png'
     plt.savefig(out, dpi=150)
     plt.close()
 
-    print(f'Saved: {{out}}')
-
+    print(f'Saved: {out}')
 
 def main():
     args = parse_args()
@@ -156,10 +157,7 @@ def main():
     sample = normData.sample(False, args.viz_sample).collect()
     print(f"Sample size: {len(sample)}")
 
-    if sample:
-        viz_path = saveVisualization([v.toArray() for v in sample], args.output_dir)
-        print(f"Visualization script written to: {viz_path}")
-        print(f"Run it with:  python3 {viz_path}")
+    saveVisualization([v.toArray() for v in sample], args.output_dir)
 
     spark.stop()
 
