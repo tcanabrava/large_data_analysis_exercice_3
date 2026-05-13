@@ -1,0 +1,34 @@
+Problem 2 – Latent Semantic Analysis of Wikipedia Movie Plots
+=============================================================
+
+Script: problem_2_isa_movies.py
+Dataset: wiki_movie_plots_deduped.csv  (134,164 movies)
+
+How to run (IRIS cluster):
+--------------------------
+spark-submit problem2_lsa_movies.py \
+  --data_path /path/to/wiki_movie_plots_deduped.csv \
+  --stopwords /path/to/stopwords.txt \
+  --numFreq 5000 --k 25
+
+---------------------------------
+Number of movie articles: ___
+SVD runtime (numFreq=5000, k=25): ___s
+
+Sample top-25 concepts (first 3):
+  Concept 1 terms: ...
+  Concept 1 top docs + genres: ...
+
+  Concept 2 terms: ...
+  ...
+
+Search engine results (5–10 queries):
+  Query ["love","romance","wedding"]:
+    1. ...
+  Query ["war","battle","soldier"]:
+    1. ...
+  (fill in)
+
+Observations:
+  - Did SVD improve document representation? ___
+  - Most coherent concept found: ___

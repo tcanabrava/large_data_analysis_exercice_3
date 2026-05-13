@@ -1,0 +1,63 @@
+Problem 1 – Latent Semantic Analysis of Wikipedia Articles
+==========================================================
+
+Script: problem_1_wikipedia.py
+
+How to run (IRIS cluster):
+--------------------------
+# Part (a) – NLP tokenizer, single run, top-25 concepts
+spark-submit problem1_lsa_wikipedia.py \
+  --data_path /path/to/Wikipedia-En-41784-Articles/*/* \
+  --stopwords /path/to/stopwords.txt \
+  --numFreq 5000 --k 25 --use_nlp
+
+# Part (a) – Simple regex tokenizer
+spark-submit problem1_lsa_wikipedia.py \
+  --data_path /path/to/Wikipedia-En-41784-Articles/*/* \
+  --stopwords /path/to/stopwords.txt \
+  --numFreq 5000 --k 25
+
+# Part (b) – Grid search (runs all 3x3 = 9 combinations, NLP version)
+spark-submit problem1_lsa_wikipedia.py \
+  --data_path /path/to/Wikipedia-En-41784-Articles/*/* \
+  --stopwords /path/to/stopwords.txt \
+  --use_nlp --grid_search
+
+# Part (c) – Search engine with custom query
+spark-submit problem1_lsa_wikipedia.py \
+  --data_path /path/to/Wikipedia-En-41784-Articles/*/* \
+  --stopwords /path/to/stopwords.txt \
+  --numFreq <best_numFreq> --k <best_k> --use_nlp \
+  --query computer science algorithm
+
+---------------------------------
+Number of articles: ___
+Number of files:    ___
+
+Grid search runtimes (NLP tokenizer):
+  numFreq=5000,  k=25:  ___s
+  numFreq=5000,  k=100: ___s
+  numFreq=5000,  k=250: ___s
+  numFreq=10000, k=25:  ___s
+  numFreq=10000, k=100: ___s
+  numFreq=10000, k=250: ___s
+  numFreq=20000, k=25:  ___s
+  numFreq=20000, k=100: ___s
+  numFreq=20000, k=250: ___s
+
+Grid search runtimes (Simple tokenizer):
+  (same table)
+
+Best hyper-parameters found: numFreq=___, k=___
+Reason: ___
+
+Sample search engine results (5–10 queries):
+  Query ["computer","science"]:
+    1. ...
+  Query ["war","battle"]:
+    1. ...
+  (fill in)
+
+Observations:
+  - NLP vs Simple tokenizer differences: ___
+  - Quality of latent concepts: ___

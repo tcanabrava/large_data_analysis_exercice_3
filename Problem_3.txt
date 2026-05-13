@@ -1,0 +1,37 @@
+Problem 3 – Outlier Detection for Gearbox Readings
+===================================================
+
+Script: problem_3_gearbox.py
+Dataset: gearbox/ directory — 109 CSV files, ~14.5M rows, 3 sensor columns (no header)
+
+How to run (IRIS cluster):
+--------------------------
+spark-submit problem3_kmeans_gearbox.py \
+  --data_path "/path/to/gearbox/*.csv" \
+  --k_min 2 --k_max 12 \
+  --top_outliers 25 \
+  --output_dir ./output_p3
+
+Total readings: ~14,500,000
+
+K-Means runtimes and average distances:
+  k=2:  time=___s  avg_dist=___  wssse=___
+  k=3:  time=___s  avg_dist=___  wssse=___
+  k=4:  time=___s  avg_dist=___  wssse=___
+  k=5:  time=___s  avg_dist=___  wssse=___
+  k=6:  time=___s  avg_dist=___  wssse=___
+  k=7:  time=___s  avg_dist=___  wssse=___
+  k=8:  time=___s  avg_dist=___  wssse=___
+  k=9:  time=___s  avg_dist=___  wssse=___
+  k=10: time=___s  avg_dist=___  wssse=___
+  k=11: time=___s  avg_dist=___  wssse=___
+  k=12: time=___s  avg_dist=___  wssse=___
+
+Top-3 outliers for k=2 (example):
+  1. dist=___  raw=[___, ___, ___]
+  2. ...
+
+Observations:
+  - Elbow in WSSSE curve at k=___
+  - Nature of outliers (high/low sensor values): ___
+  - Visualization: gearbox_sample.png generated from a ~7000-point sample
