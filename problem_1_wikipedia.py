@@ -6,8 +6,8 @@ import time
 
 from pyspark import RDD, SparkContext
 from pyspark.sql import SparkSession
-from pyspark.mllib.linalg import Vectors
-from pyspark.mllib.linalg.distributed import RowMatrix
+from pyspark.mllib.linalg import Matrix, Vectors
+from pyspark.mllib.linalg.distributed import RowMatrix, SingularValueDecomposition
 
 from nltk.corpus import stopwords as nltk_sw
 from nltk.stem import WordNetLemmatizer
@@ -157,6 +157,28 @@ def buildTfIdf(docTermFreqs: RDD, numTerms: int, numDocs: int, sc: SparkContext)
     bIdTerms = sc.broadcast(idTerms)
     return idfs, idTerms, termIds, bIdfs, bIdTerms
 
+
+def topTermsInTopConcepts(svd: SingularValueDecomposition[RowMatrix, Matrix], numConcepts: int, numTerms: int, termIds: dict[int, str]) -> list[list[tuple[str, float]]]:
+    v = svd.V
+    arr = v.toArray().T
+    result = []
+    for i in range(numConcepts):
+        weights = sorted([(arr[i][tid], tid) for tid in range(v.numRows)], reverse=True)
+        result.append([(termIds.get(tid, str(tid)), score) for score, tid in weights[:numTerms]])
+    return result
+
+
+def topDocsInTopConcepts(svd: SingularValueDecomposition[RowMatrix, Matrix], numConcepts: int, numDocs: int, docIds: dict[int, str]) -> list[list[tuple[str, float]]]:
+    result = []
+    for i in range(numConcepts):
+        weights = sorted(
+            svd.U.rows.map(lambda row: row.toArray()[i]).zipWithUniqueId().collect(),
+            key=lambda x: -x[0]
+        )
+        result.append([(docIds.get(did, str(did)), score) for score, did in weights[:numDocs]])
+    return result
+
+
 def main():
     update_nltk_stopwords()
     args = parse_args()
@@ -197,5 +219,22 @@ def main():
         run_grid_search(spark, docTermFreqs, numDocs, tokenizer_label, sc)
         return
 
+
+    print(f"\nRunning LSA: numFreq={args.numFreq}, k={args.k}, tokenizer={tokenizer_label}")
+    svd, idfs, idTerms, termIds, elapsed = runLSA(docTermFreqs, args.numFreq, numDocs, args.k, sc)
+    print(f"SVD computed in {elapsed:.1f}s")
+
+    numConcepts = min(args.k, 25)
+
+    # Top-25 terms and top-25 docs under top-25 concepts
+    top_terms = topTermsInTopConcepts(svd, numConcepts, 25, termIds)
+    top_docs  = topDocsInTopConcepts(svd, numConcepts, 25, docIds)
+
+    print(f"\n=== Top-25 terms / docs under top-{numConcepts} concepts ===")
+    for i, (terms, docs) in enumerate(zip(top_terms, top_docs)):
+        print(f"\nConcept {i + 1}:")
+        print("  Terms: " + ", ".join(t for t, _ in terms))
+        print("  Docs:  " + ", ".join(d for d, _ in docs))
+            
 if __name__ == "__main__":
     main()
