@@ -1,5 +1,6 @@
 import argparse
 import nltk
+from pyspark.sql import SparkSession
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -18,6 +19,10 @@ def update_nltk_stopwords():
 def main():
     update_nltk_stopwords()
     args = parse_args()
+
+    spark = SparkSession.builder.appName("RunLSA_Wikipedia").getOrCreate()
+    sc = spark.sparkContext
+    sc.setLogLevel("WARN")
 
 if __name__ == "__main__":
     main()
