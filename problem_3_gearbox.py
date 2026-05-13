@@ -85,6 +85,15 @@ def calculate_k_grids(args: argparse.Namespace, normData: pyspark.RDD[DenseVecto
         all_outliers[k] = top
         dist_raw.unpersist()
 
+    return all_outliers
+
+def display_outliners(args: argparse.Namespace, all_outliers: dict):
+    for k in range(args.k_min, args.k_max + 1):
+        print(f"\n=== Top-{args.top_outliers} outliers for k={k} ===")
+        for rank, (dist, vec) in enumerate(all_outliers[k], 1):
+            vals = ", ".join(f"{v:.6f}" for v in vec.toArray())
+            print(f"  {rank:2}. dist={dist:.6f}  raw=[{vals}]")
+
 def main():
     args = parse_args()
 
@@ -107,7 +116,8 @@ def main():
     normData = data.map(lambda v: normalizeVector(v, means, stdevs))
     normData.cache()
 
-    calculate_k_grids(args, normData, data)
+    all_outliers = calculate_k_grids(args, normData, data)
+    display_outliners(args, all_outliers)
 
 
 if __name__ == "__main__":
