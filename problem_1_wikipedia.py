@@ -1,4 +1,5 @@
 import argparse
+import nltk
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -10,7 +11,12 @@ def parse_args() -> argparse.Namespace:
     args = parser.parse_args()
     return args
 
+def update_nltk_stopwords():
+    for _corpus in ("stopwords", "punkt_tab", "wordnet"):
+        nltk.download(_corpus, quiet=True)
+
 def main():
+    update_nltk_stopwords()
     args = parse_args()
 
 if __name__ == "__main__":
