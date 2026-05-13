@@ -1,9 +1,15 @@
 
 import argparse
 import math
+import time
 
+import pyspark
 from pyspark.sql import SparkSession
 
+from pyspark.mllib.clustering import KMeans
+from pyspark.mllib.linalg import DenseVector, Vectors
+
+import numpy as np
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -42,6 +48,42 @@ def normalizeVector(vec, means, stdevs):
         for v, m, s in zip(arr, means, stdevs)
     ])
 
+def euclidean(a, b):
+    return float(np.sqrt(np.sum((np.array(a) - np.array(b)) ** 2)))
+
+def distToCentroid(vector, model):
+    cluster = model.predict(vector)
+    return euclidean(vector.toArray(), model.clusterCenters[cluster])
+
+def calculate_k_grids(args: argparse.Namespace, normData: pyspark.RDD[DenseVector], data: pyspark.RDD[DenseVector]):
+    print(f"\nRunning K-Means for k = {args.k_min} ... {args.k_max}")
+    print(f"{'k':>4}  {'time_s':>8}  {'avg_dist':>12}  {'wssse':>14}")
+
+    all_outliers = {}
+
+    for k in range(args.k_min, args.k_max + 1):
+        t0    = time.time()
+        model = KMeans.train(normData, k,
+                             maxIterations=20,
+                             runs=1,
+                             initializationMode="k-means||")
+        elapsed = time.time() - t0
+
+        # Pair each normalized vector with its original raw vector for reporting
+        dist_raw = (normData
+                    .zip(data)
+                    .map(lambda vr: (distToCentroid(vr[0], model), vr[1])))
+        dist_raw.cache()
+
+        avg_dist = dist_raw.map(lambda x: x[0]).mean()
+        wssse    = dist_raw.map(lambda x: x[0] ** 2).sum()
+
+        print(f"{k:>4}  {elapsed:>8.1f}  {avg_dist:>12.6f}  {wssse:>14.2f}")
+
+        # Top-N outliers for this k (highest distance to centroid)
+        top = dist_raw.top(args.top_outliers, key=lambda x: x[0])
+        all_outliers[k] = top
+        dist_raw.unpersist()
 
 def main():
     args = parse_args()
@@ -64,6 +106,8 @@ def main():
 
     normData = data.map(lambda v: normalizeVector(v, means, stdevs))
     normData.cache()
+
+    calculate_k_grids(args, normData, data)
 
 
 if __name__ == "__main__":
