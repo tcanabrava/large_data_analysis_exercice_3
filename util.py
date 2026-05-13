@@ -62,3 +62,11 @@ def _ensure_nltk_data():
 def update_nltk_stopwords():
     for _corpus in ("stopwords", "punkt_tab", "wordnet"):
         nltk.download(_corpus, quiet=True)
+
+def calculateTermFreqs(title_terms):
+    title, terms = title_terms
+    freq = {}
+    for t in terms:
+        freq[t] = freq.get(t, 0) + 1
+    return title, freq
+

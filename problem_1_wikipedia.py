@@ -13,7 +13,7 @@ from scipy.sparse import csr_matrix
 
 from nltk.corpus import stopwords as nltk_sw
 
-from util import lemmatize, buildTfIdf, update_nltk_stopwords
+from util import lemmatize, buildTfIdf, update_nltk_stopwords, calculateTermFreqs
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -69,13 +69,6 @@ def run_grid_search(spark: SparkSession, docTermFreqs: RDD, numDocs: int, tokeni
             print(f"{nf:>10}  {ki:>5}  {tokenizer_label:>10}  {elapsed:>8.1f}")
     spark.stop()
     return
-
-def calculateTermFreqs(title_terms):
-    title, terms = title_terms
-    freq = {}
-    for t in terms:
-        freq[t] = freq.get(t, 0) + 1
-    return title, freq
 
 def buildRowVectors(docTermFreqs: RDD, bIdTerms, bIdfs):
     return docTermFreqs.map(lambda x: x[1]).map(

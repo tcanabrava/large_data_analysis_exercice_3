@@ -1,10 +1,13 @@
 
 import argparse
 from pyspark.sql import SparkSession
-from util import update_nltk_stopwords
+from util import update_nltk_stopwords, plainTextToLemmas, calculateTermFreqs
 
-from pyspark.sql.types import (StructType, StructField,
+from pyspark.sql.types import (ArrayType, StructType, StructField,
                                 IntegerType, StringType)
+
+from pyspark.sql.functions import udf
+from nltk.corpus import stopwords as nltk_sw
 
 def movie_csv_schema():
     return StructType([
@@ -31,6 +34,8 @@ def parse_args():
     sc.setLogLevel("WARN")
 
     update_nltk_stopwords()
+    stopwords = set(nltk_sw.words("english"))
+    bStopWords = sc.broadcast(stopwords)
 
     df = (spark.read
           .option("header",    "true")
@@ -44,3 +49,26 @@ def parse_args():
     numDocs = df.count()
     print(f"Movie articles loaded: {numDocs}")
     df.show(5, truncate=80)
+
+    @udf(ArrayType(StringType()))
+    def lemmatize_udf(text):
+        return plainTextToLemmas(text, bStopWords.value)
+
+    df = df.withColumn("features", lemmatize_udf(df["plot"]))
+    df.cache()
+    df.select("title", "features").show(5, truncate=80)
+
+    # Build per-document term-frequency dicts from features
+    featureRDD = df.rdd.map(lambda row: calculateTermFreqs(row.features))
+    featureRDD.cache()
+
+    # Collect metadata (title + genres) keyed by row index
+    docMeta = (df.rdd
+               .map(lambda row: {
+                   "title":  row.title or "",
+                   "genres": [g.strip() for g in (row.genre or "unknown").split(",")]
+               })
+               .zipWithUniqueId()
+               .map(lambda x: (x[1], x[0]))
+               .collectAsMap())
+
