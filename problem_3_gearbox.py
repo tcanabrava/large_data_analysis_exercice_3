@@ -131,7 +131,10 @@ def saveVisualization(sample_points, out_dir):
 def main():
     args = parse_args()
 
-    spark = SparkSession.builder.appName("RunKMeans_Gearbox").getOrCreate()
+    spark = (SparkSession.builder
+             .appName("RunKMeans_Gearbox")
+             .config("spark.python.worker.reuse", "true")
+             .getOrCreate())
     sc    = spark.sparkContext
     sc.setLogLevel("WARN")
 
