@@ -15,11 +15,12 @@ from nltk import sent_tokenize, word_tokenize
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_path", default="../Data/Wikipedia-En-41784-Articles/*/*")
+    parser.add_argument("--data-path", default="../Data/Wikipedia-En-41784-Articles/*/*")
     parser.add_argument("--numFreq", type=int, default=5000)
     parser.add_argument("--k", type=int, default=25)
-    parser.add_argument("--use_nlp", action="store_true", default=False)
-    parser.add_argument("--grid_search", action="store_true")
+    parser.add_argument("--use-nlp", action="store_true", default=False)
+    parser.add_argument("--grid-search", action="store_true")
+    parser.add_argument("--sample", type=float, default=1.0)
     args = parser.parse_args()
     return args
 
@@ -59,7 +60,11 @@ def parse(lines) -> list[tuple[str, str]]:
             content = ""
     return docs
 
-# Reduces the words into a single common base (lemmatization)
+def _ensure_nltk_data():
+    for corpus in ("stopwords", "punkt_tab", "wordnet"):
+        nltk.download(corpus, quiet=True)
+
+
 def plainTextToLemmas(title_text, stopwords):
     title, text = title_text
     lemmatizer = WordNetLemmatizer()
@@ -70,6 +75,18 @@ def plainTextToLemmas(title_text, stopwords):
             if len(lemma) > 2 and lemma not in stopwords and lemma.isalpha():
                 lemmas.append(lemma)
     return title, lemmas
+
+
+def processPartitionNLP(partition, stopwords):
+    _ensure_nltk_data()
+    for x in partition:
+        yield plainTextToLemmas(x, stopwords)
+
+
+def plainTextToTokens(title_text, stopwords):
+    title, text = title_text
+    tokens = [w.lower() for w in text.split() if len(w) > 2 and w.isalpha() and w.lower() not in stopwords]
+    return title, tokens
 
 def run_grid_search(spark: SparkSession, docTermFreqs: RDD, numDocs: int, tokenizer_label: str, sc: SparkContext):
     grid_numFreqs = [5000, 10000, 20000]
@@ -97,6 +114,16 @@ def buildRowVectors(docTermFreqs: RDD, bIdTerms, bIdfs):
             [(bIdTerms.value[t], bIdfs.value[t] * freq[t] / sum(freq.values()))
              for t in freq if t in bIdTerms.value]
         )
+    )
+
+def lemmatize(args, plainText, bStopWords):
+    if not args.use_nlp:
+        return plainText.map(lambda x: plainTextToTokens(
+            x, bStopWords.value)
+        )
+
+    return plainText.mapPartitions(
+        lambda it: processPartitionNLP(it, bStopWords.value)
     )
 
 # Latent Semantyc Analysis
@@ -129,7 +156,10 @@ def main():
     update_nltk_stopwords()
     args = parse_args()
 
-    spark = SparkSession.builder.appName("RunLSA_Wikipedia").getOrCreate()
+    spark = (SparkSession.builder
+             .appName("RunLSA_Wikipedia")
+             .config("spark.python.worker.reuse", "true")
+             .getOrCreate())
     sc = spark.sparkContext
     sc.setLogLevel("WARN")
 
@@ -149,11 +179,7 @@ def main():
     tokenizer_label = "NLP" if args.use_nlp else "Simple"
     print(f"Tokenizer: {tokenizer_label}")
 
-    if args.use_nlp:
-        lemmatized = plainText.mapPartitions(
-            lambda it: (plainTextToLemmas(x, bStopWords.value) for x in it)
-        )
-
+    lemmatized = lemmatize(args, plainText, bStopWords)
     docTermFreqs = lemmatized.map(calculateTermFreqs)
     docTermFreqs.cache()
     docIds = (docTermFreqs
@@ -163,7 +189,7 @@ def main():
               .collectAsMap())
 
     if args.grid_search:
-        run_grid_search(spark)
+        run_grid_search(spark, docTermFreqs, numDocs, tokenizer_label, sc)
         return
 
 if __name__ == "__main__":
