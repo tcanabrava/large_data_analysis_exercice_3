@@ -2,23 +2,26 @@
 import argparse
 import math
 import time
-
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
 import pyspark
-from pyspark.sql import SparkSession
+import os
 
+from pyspark.sql import SparkSession
 from pyspark.mllib.clustering import KMeans
 from pyspark.mllib.linalg import DenseVector, Vectors
 
-import numpy as np
+matplotlib.use('Agg')
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_path",    default="gearbox/*.csv")
-    parser.add_argument("--k_min",        type=int,   default=2)
-    parser.add_argument("--k_max",        type=int,   default=12)
-    parser.add_argument("--top_outliers", type=int,   default=25)
-    parser.add_argument("--viz_sample",   type=float, default=0.0005)
-    parser.add_argument("--output_dir",   default="./output_p3")
+    parser.add_argument("--data-path",    default="gearbox/*.csv")
+    parser.add_argument("--k-min",        type=int,   default=2)
+    parser.add_argument("--k-max",        type=int,   default=12)
+    parser.add_argument("--top-outliers", type=int,   default=25)
+    parser.add_argument("--viz-sample",   type=float, default=0.0005)
+    parser.add_argument("--output-dir",   default="./output_p3")
     args = parser.parse_args()
     return args
 
@@ -94,6 +97,36 @@ def display_outliners(args: argparse.Namespace, all_outliers: dict):
             vals = ", ".join(f"{v:.6f}" for v in vec.toArray())
             print(f"  {rank:2}. dist={dist:.6f}  raw=[{vals}]")
 
+
+def saveVisualization(sample_points, out_dir):
+    os.makedirs(out_dir, exist_ok=True)
+    data_repr = repr([[float(x) for x in pt] for pt in sample_points])
+
+    sample = {data_repr}
+    arr = np.array(sample)
+    n   = len(arr)
+
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+    fig.suptitle(f'Gearbox Sensor Readings — Normalized Sample (n={{n}})')
+
+    pairs = [(0, 1, 'Sensor 1', 'Sensor 2'),
+            (0, 2, 'Sensor 1', 'Sensor 3'),
+            (1, 2, 'Sensor 2', 'Sensor 3')]
+
+    for ax, (xi, yi, xl, yl) in zip(axes, pairs):
+        ax.scatter(arr[:, xi], arr[:, yi], s=1, alpha=0.3)
+        ax.set_xlabel(xl)
+        ax.set_ylabel(yl)
+        ax.set_title(f'{{xl}} vs {{yl}}')
+
+    plt.tight_layout()
+    out = 'gearbox_sample.png'
+    plt.savefig(out, dpi=150)
+    plt.close()
+
+    print(f'Saved: {{out}}')
+
+
 def main():
     args = parse_args()
 
@@ -119,6 +152,16 @@ def main():
     all_outliers = calculate_k_grids(args, normData, data)
     display_outliners(args, all_outliers)
 
+    print(f"\nSampling {args.viz_sample * 100:.2f}% of normalized data for visualization ...")
+    sample = normData.sample(False, args.viz_sample).collect()
+    print(f"Sample size: {len(sample)}")
+
+    if sample:
+        viz_path = saveVisualization([v.toArray() for v in sample], args.output_dir)
+        print(f"Visualization script written to: {viz_path}")
+        print(f"Run it with:  python3 {viz_path}")
+
+    spark.stop()
 
 if __name__ == "__main__":
     main()
