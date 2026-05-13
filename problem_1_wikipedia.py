@@ -1,6 +1,6 @@
 import argparse
 
-def main():
+def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_path", default="../Data/Wikipedia-En-41784-Articles/*/*")
     parser.add_argument("--numFreq", type=int, default=5000)
@@ -8,6 +8,10 @@ def main():
     parser.add_argument("--use_nlp", action="store_true", default=False)
     parser.add_argument("--grid_search", action="store_true")
     args = parser.parse_args()
+    return args
+
+def main():
+    args = parse_args()
 
 if __name__ == "__main__":
     main()
