@@ -42,7 +42,10 @@ def parse_args():
     parser.add_argument("--numFreq", type=int, default=5000)
     parser.add_argument("--k", type=int, default=25)
     args = parser.parse_args()
+    return args
 
+def main():
+    args = parse_args()
     spark = SparkSession.builder.appName("RunLSA_Movies").getOrCreate()
     sc    = spark.sparkContext
     sc.setLogLevel("WARN")
@@ -138,3 +141,6 @@ def parse_args():
             print(f"  {rank}. [{score:.6f}] {title!r}")
 
     spark.stop()
+
+if __name__ == "__main__":
+    main()
