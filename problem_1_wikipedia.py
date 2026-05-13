@@ -13,7 +13,7 @@ from scipy.sparse import csr_matrix
 
 from nltk.corpus import stopwords as nltk_sw
 
-from util import lemmatize, buildTfIdf
+from util import lemmatize, buildTfIdf, update_nltk_stopwords
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -26,11 +26,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--query", nargs="+", default=None)
     args = parser.parse_args()
     return args
-
-def update_nltk_stopwords():
-    for _corpus in ("stopwords", "punkt_tab", "wordnet"):
-        nltk.download(_corpus, quiet=True)
-
 
 def parseHeader(line) -> tuple[str, str, str]:
     try:

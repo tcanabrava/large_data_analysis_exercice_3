@@ -58,3 +58,7 @@ def processPartitionNLP(partition, stopwords):
 def _ensure_nltk_data():
     for corpus in ("stopwords", "punkt_tab", "wordnet"):
         nltk.download(corpus, quiet=True)
+
+def update_nltk_stopwords():
+    for _corpus in ("stopwords", "punkt_tab", "wordnet"):
+        nltk.download(_corpus, quiet=True)

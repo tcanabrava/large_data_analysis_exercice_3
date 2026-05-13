@@ -1,6 +1,7 @@
 
 import argparse
 from pyspark.sql import SparkSession
+from util import update_nltk_stopwords
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -13,3 +14,5 @@ def parse_args():
     spark = SparkSession.builder.appName("RunLSA_Movies").getOrCreate()
     sc    = spark.sparkContext
     sc.setLogLevel("WARN")
+
+    update_nltk_stopwords()
