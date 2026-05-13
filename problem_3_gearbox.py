@@ -1,5 +1,6 @@
 
 import argparse
+from pyspark.sql import SparkSession
 
 
 def parse_args():
@@ -17,6 +18,9 @@ def parse_args():
 def main():
     args = parse_args()
 
+    spark = SparkSession.builder.appName("RunKMeans_Gearbox").getOrCreate()
+    sc    = spark.sparkContext
+    sc.setLogLevel("WARN")
 
 if __name__ == "__main__":
     main()
