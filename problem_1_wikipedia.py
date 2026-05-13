@@ -6,8 +6,12 @@ import time
 
 from pyspark import RDD, SparkContext
 from pyspark.sql import SparkSession
-from pyspark.mllib.linalg import Matrix, Vectors
+from pyspark.mllib.linalg import Matrix, Vectors, Matrices
 from pyspark.mllib.linalg.distributed import RowMatrix, SingularValueDecomposition
+
+import numpy as np
+
+from scipy.sparse import csr_matrix
 
 from nltk.corpus import stopwords as nltk_sw
 from nltk.stem import WordNetLemmatizer
@@ -22,6 +26,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--use-nlp", action="store_true", default=False)
     parser.add_argument("--grid-search", action="store_true")
     parser.add_argument("--sample", type=float, default=1.0)
+    parser.add_argument("--query", nargs="+", default=None)
     args = parser.parse_args()
     return args
 
@@ -178,6 +183,30 @@ def topDocsInTopConcepts(svd: SingularValueDecomposition[RowMatrix, Matrix], num
         result.append([(docIds.get(did, str(did)), score) for score, did in weights[:numDocs]])
     return result
 
+def multiplyByDiagonalRowMatrix(mat, diag):
+    s_arr = diag.toArray()
+    return RowMatrix(mat.rows.map(lambda v: Vectors.dense(np.multiply(v.toArray(), s_arr))))
+
+
+def termsToQueryVector(terms, idTerms, idfs):
+    pairs = [(idTerms[t], idfs[t]) for t in terms if t in idTerms and t in idfs]
+    if not pairs:
+        return None
+    indices, values = zip(*pairs)
+    return csr_matrix((list(values), (list(indices), [0] * len(indices))),
+                      shape=(len(idTerms), 1))
+
+
+def topDocsForTermQuery(US, V, query, docIds, n=10):
+    concept_vec = np.dot(V.toArray().T, query.toarray()).flatten()
+    mat = Matrices.dense(len(concept_vec), 1, concept_vec)
+    scores = (US.multiply(mat)
+                .rows.zipWithUniqueId()
+                .map(lambda x: (x[0].toArray()[0], x[1]))
+                .collect())
+    top = sorted(scores, key=lambda x: -x[0])[:n]
+    return [(docIds.get(did, str(did)), score) for score, did in top]
+
 
 def main():
     update_nltk_stopwords()
@@ -201,7 +230,6 @@ def main():
     plainText.cache()
     numDocs = plainText.count()
     print(f"Articles parsed: {numDocs}")
-
 
     tokenizer_label = "NLP" if args.use_nlp else "Simple"
     print(f"Tokenizer: {tokenizer_label}")
@@ -235,6 +263,32 @@ def main():
         print(f"\nConcept {i + 1}:")
         print("  Terms: " + ", ".join(t for t, _ in terms))
         print("  Docs:  " + ", ".join(d for d, _ in docs))
-            
+
+    US = multiplyByDiagonalRowMatrix(svd.U, svd.s)
+    sample_queries = args.query and [args.query] or [
+        ["computer", "science"],
+        ["war", "battle", "army"],
+        ["music", "song", "album"],
+        ["physics", "quantum", "energy"],
+        ["history", "ancient", "empire"],
+        ["football", "soccer", "player"],
+        ["film", "movie", "director"],
+        ["mathematics", "algebra", "geometry"],
+    ]
+
+    print("\n=== Search Engine ===")
+    for q in sample_queries:
+        q_lower = [t.lower() for t in q]
+        qvec = termsToQueryVector(q_lower, idTerms, idfs)
+        if qvec is None:
+            print(f"Query {q}: no terms found in vocabulary")
+            continue
+        results = topDocsForTermQuery(US, svd.V, qvec, docIds, n=10)
+        print(f"\nQuery: {q}")
+        for rank, (title, score) in enumerate(results, 1):
+            print(f"  {rank:2}. [{score:.6f}] {title}")
+
+    spark.stop()
+
 if __name__ == "__main__":
     main()
