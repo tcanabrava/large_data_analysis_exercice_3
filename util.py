@@ -2,6 +2,10 @@
 from nltk.stem import WordNetLemmatizer
 from nltk import sent_tokenize, word_tokenize
 import nltk
+from pyspark import RDD, SparkContext
+
+import math
+import operator
 
 def plainTextToLemmas(title_text, stopwords):
     title, text = title_text
@@ -13,7 +17,6 @@ def plainTextToLemmas(title_text, stopwords):
             if len(lemma) > 2 and lemma not in stopwords and lemma.isalpha():
                 lemmas.append(lemma)
     return title, lemmas
-
 
 def plainTextToTokens(title_text, stopwords):
     title, text = title_text
@@ -31,6 +34,21 @@ def lemmatize(args, plainText, bStopWords):
         lambda it: processPartitionNLP(it, bStopWords.value)
     )
 
+def _term_count(term: str) -> tuple[str, int]:
+    return term, 1
+
+def buildTfIdf(docTermFreqs: RDD, numTerms: int, numDocs: int, sc: SparkContext):
+    docFreqs = (docTermFreqs
+                .flatMap(lambda x: x[1].keys())
+                .map(_term_count)
+                .reduceByKey(operator.add, numPartitions=24))
+    topDocFreqs = docFreqs.top(numTerms, key=lambda x: x[1])  # pyright: ignore[reportArgumentType]
+    idfs = {term: math.log(numDocs / count) for term, count in topDocFreqs}
+    idTerms = {term: i for i, (term, _) in enumerate(topDocFreqs)}
+    termIds = {v: k for k, v in idTerms.items()}
+    bIdfs = sc.broadcast(idfs)
+    bIdTerms = sc.broadcast(idTerms)
+    return idfs, idTerms, termIds, bIdfs, bIdTerms
 
 def processPartitionNLP(partition, stopwords):
     _ensure_nltk_data()

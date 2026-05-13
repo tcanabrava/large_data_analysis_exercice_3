@@ -1,7 +1,5 @@
 import argparse
 import nltk
-import math
-import operator
 import time
 
 from pyspark import RDD, SparkContext
@@ -15,7 +13,7 @@ from scipy.sparse import csr_matrix
 
 from nltk.corpus import stopwords as nltk_sw
 
-from util import lemmatize
+from util import lemmatize, buildTfIdf
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -105,24 +103,6 @@ def runLSA(docTermFreqs: RDD, numTerms: int, numDocs: int, k: int, sc: SparkCont
     bIdfs.unpersist()
     bIdTerms.unpersist()
     return svd, idfs, idTerms, termIds, elapsed
-
-# Term Frequency - Inverse Document Frequency
-def _term_count(term: str) -> tuple[str, int]:
-    return term, 1
-
-
-def buildTfIdf(docTermFreqs: RDD, numTerms: int, numDocs: int, sc: SparkContext):
-    docFreqs = (docTermFreqs
-                .flatMap(lambda x: x[1].keys())
-                .map(_term_count)
-                .reduceByKey(operator.add, numPartitions=24))
-    topDocFreqs = docFreqs.top(numTerms, key=lambda x: x[1])  # pyright: ignore[reportArgumentType]
-    idfs = {term: math.log(numDocs / count) for term, count in topDocFreqs}
-    idTerms = {term: i for i, (term, _) in enumerate(topDocFreqs)}
-    termIds = {v: k for k, v in idTerms.items()}
-    bIdfs = sc.broadcast(idfs)
-    bIdTerms = sc.broadcast(idTerms)
-    return idfs, idTerms, termIds, bIdfs, bIdTerms
 
 
 def topTermsInTopConcepts(svd: SingularValueDecomposition[RowMatrix, Matrix], numConcepts: int, numTerms: int, termIds: dict[int, str]) -> list[list[tuple[str, float]]]:
