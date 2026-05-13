@@ -111,8 +111,8 @@ def main():
         print(f"\nConcept {i + 1}:")
         print("  Terms: " + ", ".join(t for t, _ in terms))
         print("  Docs:")
-        for title, score, genres in docs[:5]:
-            print(f"    [{score:.4f}] {title!r}  genres: {genres}")
+        for meta, score in docs[:5]:
+            print(f"    [{score:.4f}] {meta['title']!r}  genres: {meta['genres']}")
 
     # ── (e) Keyword queries ──────────────────────────────────────────────────
     US = multiplyByDiagonalRowMatrix(svd.U, svd.s)
