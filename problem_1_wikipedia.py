@@ -2,6 +2,8 @@ import argparse
 import nltk
 from pyspark.sql import SparkSession
 from nltk.corpus import stopwords as nltk_sw
+from nltk.stem import WordNetLemmatizer
+from nltk import sent_tokenize, word_tokenize
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -49,6 +51,18 @@ def parse(lines) -> list[tuple[str, str]]:
             content = ""
     return docs
 
+# Reduces the words into a single common base (lemmatization)
+def plainTextToLemmas(title_text, stopwords):
+    title, text = title_text
+    lemmatizer = WordNetLemmatizer()
+    lemmas = []
+    for sentence in sent_tokenize(text):
+        for token in word_tokenize(sentence):
+            lemma = lemmatizer.lemmatize(token.lower())
+            if len(lemma) > 2 and lemma not in stopwords and lemma.isalpha():
+                lemmas.append(lemma)
+    return title, lemmas
+
 
 def main():
     update_nltk_stopwords()
@@ -69,6 +83,15 @@ def main():
     plainText.cache()
     numDocs = plainText.count()
     print(f"Articles parsed: {numDocs}")
+
+
+    tokenizer_label = "NLP" if args.use_nlp else "Simple"
+    print(f"Tokenizer: {tokenizer_label}")
+
+    if args.use_nlp:
+        lemmatized = plainText.mapPartitions(
+            lambda it: (plainTextToLemmas(x, bStopWords.value) for x in it)
+        )
 
 if __name__ == "__main__":
     main()
