@@ -14,9 +14,8 @@ import numpy as np
 from scipy.sparse import csr_matrix
 
 from nltk.corpus import stopwords as nltk_sw
-from nltk.stem import WordNetLemmatizer
-from nltk import sent_tokenize, word_tokenize
 
+from util import lemmatize
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -66,34 +65,6 @@ def parse(lines) -> list[tuple[str, str]]:
             content = ""
     return docs
 
-def _ensure_nltk_data():
-    for corpus in ("stopwords", "punkt_tab", "wordnet"):
-        nltk.download(corpus, quiet=True)
-
-
-def plainTextToLemmas(title_text, stopwords):
-    title, text = title_text
-    lemmatizer = WordNetLemmatizer()
-    lemmas = []
-    for sentence in sent_tokenize(text):
-        for token in word_tokenize(sentence):
-            lemma = lemmatizer.lemmatize(token.lower())
-            if len(lemma) > 2 and lemma not in stopwords and lemma.isalpha():
-                lemmas.append(lemma)
-    return title, lemmas
-
-
-def processPartitionNLP(partition, stopwords):
-    _ensure_nltk_data()
-    for x in partition:
-        yield plainTextToLemmas(x, stopwords)
-
-
-def plainTextToTokens(title_text, stopwords):
-    title, text = title_text
-    tokens = [w.lower() for w in text.split() if len(w) > 2 and w.isalpha() and w.lower() not in stopwords]
-    return title, tokens
-
 def run_grid_search(spark: SparkSession, docTermFreqs: RDD, numDocs: int, tokenizer_label: str, sc: SparkContext):
     grid_numFreqs = [5000, 10000, 20000]
     grid_ks = [25, 100, 250]
@@ -122,15 +93,6 @@ def buildRowVectors(docTermFreqs: RDD, bIdTerms, bIdfs):
         )
     )
 
-def lemmatize(args, plainText, bStopWords):
-    if not args.use_nlp:
-        return plainText.map(lambda x: plainTextToTokens(
-            x, bStopWords.value)
-        )
-
-    return plainText.mapPartitions(
-        lambda it: processPartitionNLP(it, bStopWords.value)
-    )
 
 # Latent Semantyc Analysis
 def runLSA(docTermFreqs: RDD, numTerms: int, numDocs: int, k: int, sc: SparkContext):
