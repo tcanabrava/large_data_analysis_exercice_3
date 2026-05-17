@@ -1,0 +1,206 @@
+Files loaded: 1060
+Articles parsed: 41784
+Tokenizer: NLP
+
+Running LSA: numFreq=5000, k=25, tokenizer=NLP
+SVD computed in 712.0s
+
+=== Top-25 terms / docs under top-25 concepts ===
+
+Concept 1:
+  Terms: refer, may, county, variant, refers, mythology, greek, also, alexander, albert, charles, name, onlyinclude, place, nicholas, surname, mar, word, united, arc, following, calendar, orange, similar, submarine
+  Docs:  D6, PDS, ML, AW, Au, Ai, BE, BC, BBS, CE, Down, E2, G4, GM, IP, KY, K7, KMS, K9, LMS, MU, M4, M107, Out, OS
+
+Concept 2:
+  Terms: refer, may, variant, albert, nicholas, arc, suspicion, gary, dominance, patch, bitter, clash, pipe, alexander, survivor, quick, progressive, attorney, orange, thompson, kennedy, flash, alien, dual, fault
+  Docs:  D6, PDS, AW, Au, Ai, BE, BC, BBS, CE, Down, E2, G4, GM, IP, KY, K7, KMS, K9, LMS, MU, M4, ML, M107, Out, OS
+
+Concept 3:
+  Terms: onlyinclude, unknown, date, event, july, december, fiction, ongoing, publication, refer, death, birth, mathematician, jones, war, october, april, napoleon, william, world, mount, olympics, olympic, established, burning
+  Docs:  1662, 1789, 1752, 1730, 1680, 1636, 1594, 1604, 1605, 1616, 1625, 1637, 1758, 1799, 1592, 1732, 1786, 1777, 1769, 1761, 1753, 1741, 1738, 1731, 1725
+
+Concept 4:
+  Terms: decade, designated, lasted, december, january, lasting, begin, end, assassination, unknown, date, programming, century, july, pronounced, county, indigenous, language, onlyinclude, film, list, international, world, people, state
+  Docs:  1700s (decade), 100s (decade), 200s (decade), 400s (decade), 1000s (decade), 500s BC (decade), 1600s (decade), 800s (decade), 700s (decade), 1200s (decade), 1300s (decade), 900s (decade), 1100s (decade), 1500s (decade), 500s (decade), 200s BC (decade), 1600s BC (decade), 1100s BC (decade), 1200s BC (decade), 1000s BC (decade), 1500s BC (decade), 100s BC (decade), 400s BC (decade), 600s BC (decade), 700s BC (decade)
+
+Concept 5:
+  Terms: designated, fiction, november, unesco, fifteen, set, anniversary, county, recognized, international, youth, released, indigenous, nation, year, united, march, event, telecommunication, state, world, people, arab, city, end
+  Docs:  2001, 1999, 1996, 1998, 1992, 2002, 2008, 2003, 2006, 2013, 2012, 2014, 2015, 2016, 2009, 2007, 2004, 1985, 2005, 1986, 2011, Toll switching trunk, Priority level, 2010, Telesto (moon)
+
+Concept 6:
+  Terms: onlyinclude, julian, decade, display, link, designated, refer, calendar, starting, full, leap, unknown, thursday, monday, saturday, date, friday, common, topic, sunday, beneficial, arises, desirable, problematic, prevents
+  Docs:  1662, 1789, 1752, 1730, 1680, 1636, 1594, 1604, 1605, 1616, 1625, 1637, 1758, 1799, 1592, 1732, 1786, 1777, 1769, 1761, 1753, 1741, 1738, 1731, 1725
+
+Concept 7:
+  Terms: october, unknown, date, julian, calendar, display, link, decade, onlyinclude, starting, full, refer, designated, leap, thursday, monday, saturday, common, sunday, friday, topic, prevents, emphasize, simplest, desirable
+  Docs:  October 25, October 1, October 28, October 24, October 3, October 17, October 10, October 26, October 27, October 29, October 30, October 31, October 11, October 20, October 7, October 4, October 14, October 2, October 12, October 5, October 6, October 8, October 18, October 9, October 13
+
+Concept 8:
+  Terms: september, december, february, july, november, august, january, june, county, march, attack, hemisphere, day, film, onlyinclude, city, pope, list, album, state, time, island, following, battle, game
+  Docs:  September 1, September 2, September 21, September 28, September 16, September 23, September 4, September 30, September 22, September 27, September 11, September 14, September 6, September 7, September 3, September 5, September 17, September 10, September 12, September 13, September 15, September 18, September 19, September 20, September 26
+
+Concept 9:
+  Terms: february, december, july, november, january, county, august, draw, june, march, domini, anno, condita, urbe, denomination, consulship, naming, prevalent, year, game, medieval, roman, state, era, winter
+  Docs:  February 1, February 14, February 25, February 10, February 19, February 23, February 22, February 21, February 15, February 6, February 20, February 7, February 5, February 26, February 12, February 17, February 13, February 11, February 27, February 28, February 2, February 3, February 8, February 9, February 16
+
+Concept 10:
+  Terms: december, july, january, november, domini, anno, condita, urbe, denomination, county, consulship, prevalent, naming, august, medieval, june, era, year, method, roman, frequently, europe, lasting, onlyinclude, death
+  Docs:  December 7, December 15, December 8, December 28, December 31, December 16, December 25, December 17, December 18, December 6, December 5, December 4, December 3, December 2, December 1, December 24, December 26, December 11, December 27, December 9, December 12, December 30, December 10, December 22, December 19
+
+Concept 11:
+  Terms: december, february, september, july, april, october, designated, calendar, julian, onlyinclude, display, refer, link, leap, full, starting, lasting, topic, friday, draw, arises, prevents, beneficial, prone, desirable
+  Docs:  December 7, December 15, December 8, December 28, December 31, December 16, December 25, December 17, December 18, December 6, December 5, December 4, December 3, December 2, December 1, December 24, December 26, December 11, December 27, December 9, December 12, December 30, December 10, December 22, December 19
+
+Concept 12:
+  Terms: july, domini, anno, condita, urbe, denomination, consulship, august, prevalent, naming, medieval, era, year, method, frequently, decade, europe, onlyinclude, roman, period, less, became, county, june, early
+  Docs:  July 20, July 25, July 10, July 1, July 3, July 4, July 5, July 6, July 11, July 8, July 13, July 9, July 24, July 26, July 30, July 27, July 16, July 29, July 12, July 22, July 14, July 28, July 15, July 17, July 18
+
+Concept 13:
+  Terms: july, november, september, february, julian, april, october, display, link, calendar, starting, full, december, leap, thursday, common, monday, friday, saturday, sunday, refer, designated, decade, religion, topic
+  Docs:  July 20, July 25, July 10, July 1, July 3, July 4, July 5, July 6, July 11, July 8, July 13, July 9, July 24, July 26, July 30, July 27, July 16, July 29, July 12, July 22, July 14, July 28, July 15, July 17, July 18
+
+Concept 14:
+  Terms: julian, display, link, starting, calendar, full, leap, common, july, thursday, monday, friday, saturday, sunday, august, january, religion, unknown, date, disease, april, list, november, october, september
+  Docs:  1204, 1232, 1120, 1400, 1176, 1092, Link, 1084, 1196, 1168, 1056, 1280, 1188, 1468, 1384, 1272, 1132, 1076, 1104, 1244, 908, 1144, 1172, 1060, 1200
+
+Concept 15:
+  Terms: august, july, november, december, september, april, february, october, domini, anno, condita, urbe, denomination, consulship, prevalent, naming, onlyinclude, medieval, era, frequently, method, refer, europe, decade, less
+  Docs:  August 22, August 27, August 6, August 9, August 13, August 2, August 1, August 3, August 8, August 14, August 15, August 16, August 17, August 18, August 19, August 21, August 25, August 23, August 24, August 31, August 28, August 29, August 30, August 5, August 11
+
+Concept 16:
+  Terms: december, june, august, decade, julian, display, november, link, february, september, starting, april, october, full, leap, calendar, thursday, topic, refer, common, religion, friday, sunday, saturday, onlyinclude
+  Docs:  December 7, December 15, December 8, December 28, December 31, December 16, December 25, December 17, December 18, December 6, December 5, December 4, December 3, December 2, December 1, December 24, December 26, December 11, December 27, December 9, December 12, December 30, December 10, December 22, December 19
+
+Concept 17:
+  Terms: january, june, august, july, september, november, february, april, october, onlyinclude, domini, anno, denomination, condita, urbe, prevalent, consulship, refer, naming, december, designated, medieval, topic, display, era
+  Docs:  January 2, January 3, January 15, January 26, January 28, January 31, January 30, January 29, January 25, January 11, January 27, January 17, January 22, January 24, January 4, January 6, January 7, January 8, January 23, January 19, January 16, January 9, January 10, January 12, January 18
+
+Concept 18:
+  Terms: march, january, june, refer, august, july, february, november, december, onlyinclude, april, domini, anno, september, october, condita, urbe, denomination, consulship, prevalent, naming, medieval, calendar, designated, era
+  Docs:  March 1, March 28, March 2, March 11, March 3, March 25, March 16, March 30, March 6, March 8, March 9, March 10, March 12, March 14, March 23, March 22, March 17, March 18, March 5, March 4, March 19, March 26, March 27, March 29, March 31
+
+Concept 19:
+  Terms: onlyinclude, event, county, topic, religion, ongoing, fiction, publication, march, january, october, june, asia, refer, august, september, february, median, decade, household, november, income, census, latino, hispanic
+  Docs:  1662, 1789, 1752, 1730, 1680, 1636, 1594, 1604, 1605, 1616, 1625, 1637, 1758, 1799, 1592, 1732, 1786, 1777, 1769, 1761, 1753, 1741, 1738, 1731, 1725
+
+Concept 20:
+  Terms: county, unknown, date, calendar, refer, march, domini, anno, january, condita, denomination, urbe, june, consulship, prevalent, july, december, august, naming, september, april, november, october, february, julian
+  Docs:  Clinton County, Montgomery County, Madison County, Suffolk County, Wayne County, Somerset County, Tioga County, Butte County, Baldwin County, Orange County, Carbon County, Nassau County, Butler County, Cherokee County, Barbour County, Bibb County, Blount County, Cleburne County, Delaware County, Coffee County, Adams County, Columbia County, Chambers County, Frederick County, Monroe County
+
+Concept 21:
+  Terms: mythology, greek, surname, telecommunication, name, character, attributed, god, son, transmission, signal, goddess, king, refers, meaning, individual, system, hebrew, several, film, daughter, roman, ancient, game, data
+  Docs:  Hebrew mythology, Aegle (mythology), Alcippe (Greek mythology), Laodamia, Comaetho, Dryops, Megareus, Coroebus, Hicetaon, Alphesiboea, Polydora, Megapenthes, Toxeus, Amphion, Antianeira, Alcathous, Hypseus, Antiphates, Achelois, Cydippe, Pierus, Iasus, Evadne, Tecmessa, Deipyle
+
+Concept 22:
+  Terms: surname, notable, people, include, german, russian, hungarian, name, list, county, japanese, bearing, spy, von, given, cook, italian, fictional, person, origin, family, common, english, derived, noble
+  Docs:  Lichtenstein (surname), Nabokov (surname), Liszt (surname), Habermas, McGwire, Abendana, Schoenberg, Bulgakov, Schedl, Scarlatti, Moog (surname), Siebold, Kuleshov, Hanazono, Mentes, McBain, Reinhard, Abati, Florine, Kornilov, Weber, Simkin, Konoe, Webster, Redding
+
+Concept 23:
+  Terms: telecommunication, transmission, signal, system, telephone, data, frequency, service, network, communication, internet, radio, channel, term, film, surname, meaning, station, may, game, code, user, computer, function, equipment
+  Docs:  Transmission, Information-bearer channel, Telecommunications in Spain, Telecommunications in Bhutan, Telecommunications in Chile, K-factor, Basic service, Telecommunications in Bulgaria, Low-performance equipment, Data forwarder, Hop (telecommunications), Camp-on busy signal, Stop signal, Network engineering, Terminal equipment, Black facsimile transmission, Ringaround, Sublayer, Noise power, Telecommunications service, Release time (telecommunication), Communications center, Protocol-control information, Effective transmission rate, Channel noise level
+
+Concept 24:
+  Terms: telecommunication, transmission, signal, mythology, meaning, telephone, channel, list, frequency, communication, equipment, internet, greek, noise, term, county, data, radio, following, service, network, circuit, information, television, user
+  Docs:  Transmission, Information-bearer channel, Telecommunications in Spain, Telecommunications in Bhutan, Telecommunications in Chile, K-factor, Basic service, Telecommunications in Bulgaria, Low-performance equipment, Hop (telecommunications), List of telecommunications encryption terms, Ringaround, Sublayer, Data forwarder, Camp-on busy signal, Black facsimile transmission, Terminal equipment, Protocol-control information, Noise power, Stop signal, Conditioning equipment, Release time (telecommunication), Communications deception, Communications center, Telecommunications service
+
+Concept 25:
+  Terms: refer, mar, chinese, film, river, island, city, leap, game, population, war, national, treaty, state, virtual, century, king, united, government, america, republican, storage, album, computing, league
+  Docs:  D6, PDS, U-28, KB, Chinese, Auriga, Amalthea, DMA, Extrapyramidal, Reizei, Glendower, Hydroxy, Subtitle, SSL, Tethys, Tuning, Horikawa, Nijō, Banglades, Interchangeability, Pumping, Propagation, Kabala, Folkways, Tibetan
+
+=== Search Engine ===
+
+Query: ['computer', 'science']
+   1. [0.034221] Transmission
+   2. [0.033843] Information-bearer channel
+   3. [0.032945] Telecommunications in Spain
+   4. [0.031540] Telecommunications in Bhutan
+   5. [0.029999] RN
+   6. [0.029999] JT
+   7. [0.029999] QA
+   8. [0.028434] Basic service
+   9. [0.028018] Telecommunications in Bulgaria
+  10. [0.026909] Data forwarder
+
+Query: ['war', 'battle', 'army']
+   1. [0.083010] List of poets
+   2. [0.079113] List of diseases (N)
+   3. [0.079113] List of diseases (Q)
+   4. [0.079113] List of diseases (R)
+   5. [0.079113] List of diseases (T)
+   6. [0.079113] List of diseases (U)
+   7. [0.079113] List of diseases (V)
+   8. [0.079113] List of diseases (W)
+   9. [0.079113] List of diseases (X)
+  10. [0.079113] List of diseases (Y)
+
+Query: ['music', 'song', 'album']
+   1. [0.034771] Computer language
+   2. [0.028713] Smith
+   3. [0.028641] Specie
+   4. [0.025394] Kings
+   5. [0.025359] School and university in literature
+   6. [0.025271] Kronos
+   7. [0.024934] Transport in the British Virgin Islands
+   8. [0.024418] 19th century BC
+   9. [0.023702] Rivers of America
+  10. [0.023598] Band
+
+Query: ['physics', 'quantum', 'energy']
+   1. [0.019817] RN
+   2. [0.019817] JT
+   3. [0.019817] QA
+   4. [0.017264] Computer language
+   5. [0.016451] Nm
+   6. [0.014602] Specie
+   7. [0.012507] Band
+   8. [0.012447] CAMP
+   9. [0.012316] Network engineering
+  10. [0.012202] Telecommunications in Bhutan
+
+Query: ['history', 'ancient', 'empire']
+   1. [0.075722] Hebrew mythology
+   2. [0.058959] Aegle (mythology)
+   3. [0.053030] Alcippe (Greek mythology)
+   4. [0.052615] Laodamia
+   5. [0.050280] Comaetho
+   6. [0.048589] Dryops
+   7. [0.048589] Megareus
+   8. [0.048589] Coroebus
+   9. [0.048589] Hicetaon
+  10. [0.047753] Alphesiboea
+
+Query: ['football', 'soccer', 'player']
+   1. [0.049598] List of poets
+   2. [0.049216] Lists of universities and colleges
+   3. [0.046133] List of diseases (N)
+   4. [0.046133] List of diseases (Q)
+   5. [0.046133] List of diseases (R)
+   6. [0.046133] List of diseases (T)
+   7. [0.046133] List of diseases (U)
+   8. [0.046133] List of diseases (V)
+   9. [0.046133] List of diseases (W)
+  10. [0.046133] List of diseases (X)
+
+Query: ['film', 'movie', 'director']
+   1. [0.030136] Computer language
+   2. [0.025029] Smith
+   3. [0.023601] Specie
+   4. [0.022183] School and university in literature
+   5. [0.021733] Transport in the British Virgin Islands
+   6. [0.021702] Kronos
+   7. [0.021402] 19th century BC
+   8. [0.020871] Kings
+   9. [0.020462] Academy Award for Best Assistant Director
+  10. [0.020076] Rivers of America
+
+Query: ['mathematics', 'algebra', 'geometry']
+   1. [0.011689] Specie
+   2. [0.011356] Computer language
+   3. [0.009806] Band
+   4. [0.009668] Kings
+   5. [0.009281] Cell
+   6. [0.009281] K cell
+   7. [0.009095] Function
+   8. [0.008983] Piano player
+   9. [0.008908] Kronos
+  10. [0.008521] D6

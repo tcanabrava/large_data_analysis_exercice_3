@@ -1,0 +1,27 @@
+See Run.slurm to see the SLURM setup
+
+spark-submit problem_1_wikipedia.py \
+  --data-path "/home/users/jcastroribeiro/Semester2/BigDataAnalytics/Exercise_3/large_data_analysis_exercice_3/Data/Wikipedia-En-41784-Articles/*/*" \
+  --numFreq 5000 --k 25 --use-nlp
+
+spark-submit problem_1_wikipedia.py \
+  --data-path "/home/users/jcastroribeiro/Semester2/BigDataAnalytics/Exercise_3/large_data_analysis_exercice_3/Data/Wikipedia-En-41784-Articles/*/*" \
+  --numFreq 5000 --k 25 
+
+spark-submit problem_1_wikipedia.py \
+  --data-path "/home/users/jcastroribeiro/Semester2/BigDataAnalytics/Exercise_3/large_data_analysis_exercice_3/Data/Wikipedia-En-41784-Articles/*/*" \
+  --use-nlp --grid-search
+
+spark-submit problem_1_wikipedia.py \
+  --data-path "/home/users/jcastroribeiro/Semester2/BigDataAnalytics/Exercise_3/large_data_analysis_exercice_3/Data/Wikipedia-En-41784-Articles/*/*" \
+  --numFreq 5000 --k 25 --use-nlp \
+  --query computer science algorithm
+
+spark-submit problem_2_isa_movies.py \
+  --data_path "/home/users/jcastroribeiro/Semester2/BigDataAnalytics/Exercise_3/large_data_analysis_exercice_3/Data/movieplots/wiki_movie_plots_deduped.csv" \
+  --numFreq 5000 --k 25
+
+spark-submit problem_3_gearbox.py \
+  --data-path "/home/users/jcastroribeiro/Semester2/BigDataAnalytics/Exercise_3/large_data_analysis_exercice_3/Data/gearbox/*.csv" \
+  --k-min 2 --k-max 12 \
+  --top-outliers 25 \

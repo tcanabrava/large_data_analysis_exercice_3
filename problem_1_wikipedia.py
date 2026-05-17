@@ -23,11 +23,11 @@ from util import (
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data-path", default="../Data/Wikipedia-En-41784-Articles/*/*")
+    parser.add_argument("--data_path", default="../Data/Wikipedia-En-41784-Articles/*/*")
     parser.add_argument("--numFreq", type=int, default=5000)
     parser.add_argument("--k", type=int, default=25)
-    parser.add_argument("--use-nlp", action="store_true", default=False)
-    parser.add_argument("--grid-search", action="store_true")
+    parser.add_argument("--use_nlp", action="store_true", default=False)
+    parser.add_argument("--grid_search", action="store_true")
     parser.add_argument("--sample", type=float, default=1.0)
     parser.add_argument("--query", nargs="+", default=None)
     args = parser.parse_args()

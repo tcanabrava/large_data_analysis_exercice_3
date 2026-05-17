@@ -1,0 +1,4 @@
+usage: problem_1_wikipedia.py [-h] [--data_path DATA_PATH] [--numFreq NUMFREQ]
+                              [--k K] [--use_nlp] [--grid_search]
+                              [--sample SAMPLE] [--query QUERY [QUERY ...]]
+problem_1_wikipedia.py: error: unrecognized arguments: --data-path /home/users/jcastroribeiro/Semester2/BigDataAnalytics/Exercise_3/large_data_analysis_exercice_3/Data/movieplots/*/* --use-nlp

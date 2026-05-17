@@ -1,0 +1,15 @@
+Files loaded: 1060
+Articles parsed: 41784
+Tokenizer: NLP
+
+=== Grid Search ===
+   numFreq      k   tokenizer    time_s
+      5000     25         NLP     709.1
+      5000    100         NLP    1042.8
+      5000    250         NLP    2075.6
+     10000     25         NLP     339.8
+     10000    100         NLP    1196.4
+     10000    250         NLP    2397.9
+     20000     25         NLP     368.5
+     20000    100         NLP    1456.8
+     20000    250         NLP    3052.9

@@ -6,13 +6,13 @@ Script: problem_1_wikipedia.py
 How to run (IRIS cluster):
 --------------------------
 # Part (a) – NLP tokenizer, single run, top-25 concepts
-spark-submit problem1_lsa_wikipedia.py \
-  --data_path /path/to/Wikipedia-En-41784-Articles/*/* \
-  --stopwords /path/to/stopwords.txt \
+spark-submit problem_1_wikipedia.py \
+  --data_path /home/users/jcastroribeiro/Semester2/BigDataAnalytics/Exercise_3/large_data_analysis_exercice_3/Data/Wikipedia-En-41784-Articles/*/* \
+  --stopwords data_path /home/users/jcastroribeiro/Semester2/BigDataAnalytics/Exercise_3/large_data_analysis_exercice_3/Data/input/stopwords.txt \
   --numFreq 5000 --k 25 --use_nlp
 
 # Part (a) – Simple regex tokenizer
-spark-submit problem1_lsa_wikipedia.py \
+spark-submit problem1_wikipedia.py \
   --data_path /path/to/Wikipedia-En-41784-Articles/*/* \
   --stopwords /path/to/stopwords.txt \
   --numFreq 5000 --k 25
