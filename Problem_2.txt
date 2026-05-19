@@ -12,23 +12,91 @@ spark-submit problem2_lsa_movies.py \
   --numFreq 5000 --k 25
 
 ---------------------------------
-Number of movie articles: ___
-SVD runtime (numFreq=5000, k=25): ___s
+Number of movie articles: 34886
+SVD runtime (numFreq=5000, k=25):  175.9s
 
 Sample top-25 concepts (first 3):
-  Concept 1 terms: ...
-  Concept 1 top docs + genres: ...
+Concept 1:
+  Terms: film, love, story, family, father, man, life, woman, girl, son, young, get, wife, police, mother, brother, friend, daughter, find, village, fall, two, child, murder, tom
+  Docs:
+    [0.0139] 'Galaxy Turnpike'  genres: ['science fiction', 'comedy']
+    [0.0134] 'Doctor Bari'  genres: ['romance']
+    [0.0124] 'Hridayer Shabdo'  genres: ['romance']
+    [0.0123] 'Radha Krishna'  genres: ['religious']
+    [0.0118] 'Manasina Maathu'  genres: ['romance']
 
-  Concept 2 terms: ...
-  ...
+Concept 2:
+  Terms: raja, film, story, vijay, village, love, krishna, family, ravi, radha, revolves, kumar, movie, rao, girl, mohan, son, life, priya, marriage, raj, anand, father, based, sister
+  Docs:
+    [0.0202] 'Radha Krishna'  genres: ['religious']
+    [0.0165] 'Walk Like a Dragon'  genres: ['drama']
+    [0.0157] 'Nallavan'  genres: ['unknown']
+    [0.0155] 'Kaaval Nilayam'  genres: ['unknown']
+    [0.0148] 'Kanteerava'  genres: ['action']
+
+Concept 3:
+  Terms: joe, jack, jim, john, johnny, war, sam, charlie, agent, harry, american, frank, mike, steve, gang, paul, bill, ship, nick, mary, german, british, detective, billy, town
+  Docs:
+    [0.0212] "Let 'Em Have It"  genres: ['crime']
+    [0.0197] 'A Prayer Before Dawn'  genres: ['unknown']
+    [0.0183] 'Border Law'  genres: ['western']
+    [0.0181] 'Backroads'  genres: ['action / drama']
+    [0.0178] 'Bright Lights'  genres: ['comedy']
 
 Search engine results (5–10 queries):
-  Query ["love","romance","wedding"]:
-    1. ...
-  Query ["war","battle","soldier"]:
-    1. ...
-  (fill in)
+
+Query: ['love', 'romance', 'wedding']
+  1. [0.887057] {'title': 'The Great Awakening', 'genres': ['drama']}
+  2. [0.881004] {'title': 'The King of Paris', 'genres': ['drama']}
+  3. [0.869585] {'title': 'Dance Pretty Lady', 'genres': ['drama']}
+  4. [0.867654] {'title': 'A Saloon Wet with Beautiful Women', 'genres': ['pink']}
+  5. [0.854256] {'title': 'Rhapsody', 'genres': ['drama']}
+
+Query: ['war', 'battle', 'soldier']
+  1. [0.984284] {'title': ' Uprising', 'genres': ['war drama']}
+  2. [0.982090] {'title': 'Leftenan Adnan', 'genres': ['action / historical']}
+  3. [0.981426] {'title': 'Tetsujin 28: The Movie', 'genres': ['unknown']}
+  4. [0.981426] {'title': 'Tetsujin Nijūhachi-gō: Hakuchū no Zangetsu', 'genres': ['anime']}
+  5. [0.980292] {'title': 'The Hook', 'genres': ['war']}
+
+Query: ['murder', 'detective', 'crime']
+  1. [0.979183] {'title': 'Violent Cop', 'genres': ['action']}
+  2. [0.977830] {'title': 'The Fairy Tale Killer', 'genres': ['horror / thriller']}
+  3. [0.975487] {'title': 'The Accidental Detective', 'genres': ['unknown']}
+  4. [0.973573] {'title': 'Inspector Hornleigh', 'genres': ['comedy/crime']}
+  5. [0.971901] {'title': 'Fast and Loose', 'genres': ['comedy mystery']}
+
+Query: ['space', 'alien', 'planet']
+  1. [0.917060] {'title': 'Invasion of the Neptune Men', 'genres': ['science fiction']}
+  2. [0.913282] {'title': 'Invisible Invaders', 'genres': ['science fiction']}
+  3. [0.913194] {'title': 'Kaibutsu-kun', 'genres': ['unknown']}
+  4. [0.913194] {'title': 'Kaibutsu-kun–Demon no ken', 'genres': ['unknown']}
+  5. [0.912136] {'title': 'Alien vs. Predator', 'genres': ['horror', 'sci-fi']}
+
+Query: ['horror', 'ghost', 'haunted']
+  1. [0.781402] {'title': 'Burned at the Stake', 'genres': ['horror']}
+  2. [0.779828] {'title': 'Ice Cream Man', 'genres': ['slasher']}
+  3. [0.764407] {'title': 'Golden Needles', 'genres': ['unknown']}
+  4. [0.764407] {'title': 'Golden Needles', 'genres': ['unknown']}
+  5. [0.763656] {'title': 'Abandoned Mine', 'genres': ['horror']}
+
+Query: ['family', 'father', 'child']
+  1. [0.984653] {'title': 'The Preparation', 'genres': ['unknown']}
+  2. [0.941732] {'title': 'Avittam Thirunaal Aarogya Sriman', 'genres': ['unknown']}
+  3. [0.941617] {'title': 'Fitzgerald Family Christmas, TheThe Fitzgerald Family Christmas', 'genres': ['comedy']}
+  4. [0.940908] {'title': 'A Cup of Kindness', 'genres': ['comedy']}
+  5. [0.940248] {'title': 'The Homecoming', 'genres': ['drama']}
 
 Observations:
-  - Did SVD improve document representation? ___
-  - Most coherent concept found: ___
+  - Did SVD improve document representation? It did, altough K=25 is not enough to capture all the semantic diversity in the data.
+  - Most coherent concept found: Concept 9.
+
+```
+Terms: krishna, murder, johnny, gang, detective, police, killer, charlie, criminal,
+       crime, film, murdered, robbery, jack, case, accused, nick, bank, suspect,
+       cop, investigate, serial, role, gangster
+Docs: Yashoda Krishna [crime-adjacent], "The Man They Couldn't Arrest" [drama],
+      Mauali Krishna [drama]
+```
+
+The terms form a tight, unambiguous semantic cluster — **crime/detective fiction**: murder, killer, criminal, robbery, accused, suspect, cop, investigate, gangster, detective.
