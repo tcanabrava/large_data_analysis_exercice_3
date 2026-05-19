@@ -121,10 +121,18 @@ def termsToQueryVector(terms, idTerms, idfs):
 
 def topDocsForTermQuery(US, V, query, docIds, n=10):
     concept_vec = np.dot(V.toArray().T, query.toarray()).flatten()
-    mat = Matrices.dense(len(concept_vec), 1, concept_vec)
-    scores = (US.multiply(mat)
-                .rows.zipWithUniqueId()
-                .map(lambda x: (x[0].toArray()[0], x[1]))
+    q_norm = np.linalg.norm(concept_vec)
+    if q_norm == 0:
+        return []
+    concept_vec = concept_vec / q_norm
+
+    scores = (US.rows
+                .zipWithUniqueId()
+                .map(lambda x: (
+                    float(np.dot(x[0].toArray(), concept_vec)) /
+                    max(float(np.linalg.norm(x[0].toArray())), 1e-10),
+                    x[1]
+                ))
                 .collect())
     top = sorted(scores, key=lambda x: -x[0])[:n]
     return [(docIds.get(did, str(did)), score) for score, did in top]
