@@ -31,19 +31,20 @@ spark-submit problem1_lsa_wikipedia.py \
   --query computer science algorithm
 
 ---------------------------------
-Number of articles: ___
-Number of files:    ___
+Number of articles: 41784
+Number of files:    1060
 
 Grid search runtimes (NLP tokenizer):
-  numFreq=5000,  k=25:  ___s
-  numFreq=5000,  k=100: ___s
-  numFreq=5000,  k=250: ___s
-  numFreq=10000, k=25:  ___s
-  numFreq=10000, k=100: ___s
-  numFreq=10000, k=250: ___s
-  numFreq=20000, k=25:  ___s
-  numFreq=20000, k=100: ___s
-  numFreq=20000, k=250: ___s
+   numFreq      k   tokenizer    time_s
+      5000     25         NLP     709.1
+      5000    100         NLP    1042.8
+      5000    250         NLP    2075.6
+     10000     25         NLP     339.8
+     10000    100         NLP    1196.4
+     10000    250         NLP    2397.9
+     20000     25         NLP     368.5
+     20000    100         NLP    1456.8
+     20000    250         NLP    3052.9
 
 Grid search runtimes (Simple tokenizer):
   (same table)
