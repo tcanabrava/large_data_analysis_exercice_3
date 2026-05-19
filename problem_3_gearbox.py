@@ -102,10 +102,7 @@ def saveVisualization(sample_points, out_dir):
         return
 
     os.makedirs(out_dir, exist_ok=True)
-    data_repr = repr([[float(x) for x in pt] for pt in sample_points])
-
-    sample = {data_repr}
-    arr = np.array(sample)
+    arr = np.array([[float(x) for x in pt] for pt in sample_points])
     n   = len(arr)
 
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
