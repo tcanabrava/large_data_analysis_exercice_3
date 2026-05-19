@@ -14,24 +14,50 @@ spark-submit problem3_kmeans_gearbox.py \
 
 Total readings: ~14,500,000
 
-K-Means runtimes and average distances:
-  k=2:  time=___s  avg_dist=___  wssse=___
-  k=3:  time=___s  avg_dist=___  wssse=___
-  k=4:  time=___s  avg_dist=___  wssse=___
-  k=5:  time=___s  avg_dist=___  wssse=___
-  k=6:  time=___s  avg_dist=___  wssse=___
-  k=7:  time=___s  avg_dist=___  wssse=___
-  k=8:  time=___s  avg_dist=___  wssse=___
-  k=9:  time=___s  avg_dist=___  wssse=___
-  k=10: time=___s  avg_dist=___  wssse=___
-  k=11: time=___s  avg_dist=___  wssse=___
-  k=12: time=___s  avg_dist=___  wssse=___
+Running K-Means for k = 2 ... 12
+   k    time_s      avg_dist           wssse
+   2      39.9      1.024520     29066938.44
+   3      62.2      0.984663     25237149.78
+   4      61.6      0.941359     21829364.11
+   5      59.5      0.891203     18839772.29
+   6      59.4      0.820764     17308957.86
+   7      60.6      0.797680     14855334.09
+   8      62.0      0.756930     13479182.93
+   9      61.6      0.726880     12583873.08
+  10      62.4      0.694314     11805690.40
+  11      64.0      0.684295     10922674.22
+  12      62.5      0.677095     10585863.21
+
 
 Top-3 outliers for k=2 (example):
-  1. dist=___  raw=[___, ___, ___]
-  2. ...
+   1. dist=39.325072  raw=[0.015717, 0.375980, 4.941400]
+   2. dist=38.131187  raw=[0.002899, -0.362850, 4.928000]
+   3. dist=30.702810  raw=[0.046387, 0.292970, 4.931600]
 
 Observations:
-  - Elbow in WSSSE curve at k=___
-  - Nature of outliers (high/low sensor values): ___
+  - Elbow in WSSSE curve at k=7
+  - Nature of outliers (high/low sensor values):
+
+  **
+
+The sensors have means `[0.022, 0.001, 2.401]`. Two distinct outlier types appear consistently across all k values:
+
+**Type A** — high sensor 2 + high sensor 3:
+```
+[0.015717,  0.375980, 4.941400]   sensor 2 ≈ 38× its mean, sensor 3 near max
+[0.002899, -0.362850, 4.928000]
+[0.046387,  0.292970, 4.931600]
+```
+Sensors 2 and 3 simultaneously spike — likely a resonance or shock event.
+
+**Type B** — high sensor 1 + near-zero sensor 3:
+```
+[0.325780, -0.042419, 0.056152]   sensor 1 ≈ 15× its mean, sensor 3 collapses
+[0.301360, -0.042725, 0.053711]
+[0.298160, -0.033112, 0.048828]
+```
+Sensor 1 spikes while sensor 3 drops to near zero — opposite pattern from Type A, suggesting a different fault mode.
+
+Both types persist regardless of k, meaning they are genuinely anomalous operating points rather than artifacts of the clustering.
+
   - Visualization: gearbox_sample.png generated from a ~7000-point sample
