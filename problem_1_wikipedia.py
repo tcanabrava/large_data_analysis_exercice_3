@@ -15,7 +15,6 @@ from util import (
     update_nltk_stopwords,
     calculateTermFreqs,
     buildRowVectors,
-    multiplyByDiagonalRowMatrix,
     termsToQueryVector,
     topDocsForTermQuery,
     topDocsInTopConcepts,
@@ -145,7 +144,6 @@ def main():
         print("  Terms: " + ", ".join(t for t, _ in terms))
         print("  Docs:  " + ", ".join(d for d, _ in docs))
 
-    US = multiplyByDiagonalRowMatrix(svd.U, svd.s)
     sample_queries = args.query and [args.query] or [
         ["computer", "science"],
         ["war", "battle", "army"],
@@ -166,7 +164,7 @@ def main():
         if qvec is None:
             print(f"Query {q}: no terms found in vocabulary")
             continue
-        results = topDocsForTermQuery(US, svd.V, qvec, docIds, n=10)
+        results = topDocsForTermQuery(svd.U, svd.V, qvec, docIds, n=10)
         print(f"\nQuery: {q}")
         for rank, (title, score) in enumerate(results, 1):
             print(f"  {rank:2}. [{score:.6f}] {title}")

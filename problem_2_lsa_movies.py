@@ -8,7 +8,6 @@ from util import (
     update_nltk_stopwords,
     calculateTermFreqs,
     buildRowVectors,
-    multiplyByDiagonalRowMatrix,
     termsToQueryVector,
     topDocsForTermQuery,
     plainTextToLemmas,
@@ -115,8 +114,6 @@ def main():
             print(f"    [{score:.4f}] {meta['title']!r}  genres: {meta['genres']}")
 
     # ── (e) Keyword queries ──────────────────────────────────────────────────
-    US = multiplyByDiagonalRowMatrix(svd.U, svd.s)
-
     queries = [
         ["love", "romance", "wedding"],
         ["war", "battle", "soldier"],
@@ -136,7 +133,7 @@ def main():
         if qvec is None:
             print(f"Query {q}: no terms in vocabulary")
             continue
-        results = topDocsForTermQuery(US, svd.V, qvec, docMeta, n=5)
+        results = topDocsForTermQuery(svd.U, svd.V, qvec, docMeta, n=5)
         print(f"\nQuery: {q}")
         for rank, (title, score) in enumerate(results, 1):
             print(f"  {rank}. [{score:.6f}] {title!r}")
