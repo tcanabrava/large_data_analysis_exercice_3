@@ -4,6 +4,7 @@ import time
 from pyspark import RDD, SparkContext
 from pyspark.sql import SparkSession
 from pyspark.mllib.linalg import Matrix
+from nltk.stem import WordNetLemmatizer
 from pyspark.mllib.linalg.distributed import RowMatrix, SingularValueDecomposition
 
 from nltk.corpus import stopwords as nltk_sw
@@ -156,9 +157,11 @@ def main():
         ["mathematics", "algebra", "geometry"],
     ]
 
+    _lemmatizer = WordNetLemmatizer()
+
     print("\n=== Search Engine ===")
     for q in sample_queries:
-        q_lower = [t.lower() for t in q]
+        q_lower = [_lemmatizer.lemmatize(t.lower()) for t in q]
         qvec = termsToQueryVector(q_lower, idTerms, idfs)
         if qvec is None:
             print(f"Query {q}: no terms found in vocabulary")
