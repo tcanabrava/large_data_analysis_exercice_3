@@ -32,7 +32,7 @@ spark-submit problem1_lsa_wikipedia.py \
 
 ---------------------------------
 Number of articles: 41784
-Number of files:    1060
+Number of files:    1172
 
 Grid search runtimes (NLP tokenizer):
    numFreq      k   tokenizer    time_s
@@ -47,17 +47,31 @@ Grid search runtimes (NLP tokenizer):
      20000    250         NLP    3052.9
 
 Grid search runtimes (Simple tokenizer):
-  (same table)
+Files loaded: 1172
+Articles parsed: 41784
+Tokenizer: Simple
+
+Note that this one run in a local environment instead of the HPC.
+but we can still see that the numbers are lower than the NLP tokenizer.
+
+=== Grid Search ===
+   numFreq      k   tokenizer    time_s
+      5000     25      Simple     242.4
+      5000    100      Simple     799.8
+      5000    250      Simple    1854.4
+     10000     25      Simple     289.0
+     10000    100      Simple     901.9
+     10000    250      Simple    2099.7
+     20000     25      Simple     354.5
+     20000    100      Simple    1142.5
+     20000    250      Simple    2711.0
+
 
 Best hyper-parameters found: numFreq=___, k=___
 Reason: ___
 
 Sample search engine results (5–10 queries):
-  Query ["computer","science"]:
-    1. ...
-  Query ["war","battle"]:
-    1. ...
-  (fill in)
+=== Search Engine ===
 
 Observations:
   - NLP vs Simple tokenizer differences: ___
