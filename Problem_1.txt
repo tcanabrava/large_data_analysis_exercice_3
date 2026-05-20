@@ -67,12 +67,116 @@ but we can still see that the numbers are lower than the NLP tokenizer.
      20000    250      Simple    2711.0
 
 
-Best hyper-parameters found: numFreq=___, k=___
-Reason: ___
+Best hyper-parameters found: numFreq=10000, k=100
+Reason: The slowdown is acceptable, given the size of the dataset. And it captures the nuances of the dataset. k=250 is not worth it, because it adds a 7-10x slowdown without any improvement in results.
 
 Sample search engine results (5–10 queries):
-=== Search Engine ===
+
+Query: ['computer', 'science']
+   1. [0.995946] Computer program
+   2. [0.995300] Abstraction (software engineering)
+   3. [0.994902] Pulley
+   4. [0.994715] Ladder logic
+   5. [0.994381] Event-driven programming
+   6. [0.994127] Load balancing (computing)
+   7. [0.994040] Preventive maintenance
+   8. [0.993513] Injective function
+   9. [0.993484] Conceptual schema
+  10. [0.993412] Intelligence agency
+
+Query: ['war', 'battle', 'army']
+   1. [0.999058] Monarchy of the United Kingdom
+   2. [0.998870] Italy
+   3. [0.998849] History of Vietnam
+   4. [0.998845] Deerhurst
+   5. [0.998553] HMAS Sydney
+   6. [0.998479] Daniel Schultz
+   7. [0.998302] Tolstoy family
+   8. [0.998286] Horn of Africa
+   9. [0.998286] Otto Mann
+  10. [0.998263] Tagus
+
+Query: ['music', 'song', 'album']
+   1. [0.999079] Psychedelic rock
+   2. [0.999004] House music
+   3. [0.998885] Andalucia (album)
+   4. [0.998666] Carmen Jones
+   5. [0.998650] Bar Kokhba (album)
+   6. [0.998593] Mustafa Altıoklar
+   7. [0.998482] Murat Ses
+   8. [0.998475] Cinema of the United Kingdom
+   9. [0.998469] The Return of Godzilla
+  10. [0.998456] Musical film
+
+Query: ['physics', 'quantum', 'energy']
+   1. [0.999854] Initial and terminal objects
+   2. [0.999582] Expansion card
+   3. [0.999557] Image antenna
+   4. [0.999353] Computer memory
+   5. [0.999351] Sputtering
+   6. [0.999294] Main lobe
+   7. [0.999285] Relay
+   8. [0.999269] Software testing
+   9. [0.999268] Atomic, molecular, and optical physics
+  10. [0.999251] Photoluminescence
+
+Query: ['history', 'ancient', 'empire']
+   1. [0.999241] Etruscan civilization
+   2. [0.998983] Siren (mythology)
+   3. [0.998719] Cernunnos
+   4. [0.998674] Prometheus
+   5. [0.998649] Plutarch
+   6. [0.998589] Diophantus
+   7. [0.998530] Latin literature
+   8. [0.998490] Old Testament
+   9. [0.998406] Pergamon
+  10. [0.998364] Icarus
+
+Query: ['football', 'soccer', 'player']
+   1. [0.997711] NP (complexity)
+   2. [0.996652] Geocaching
+   3. [0.996160] Logic programming
+   4. [0.995611] Survivors of the Valdez Oil Spill
+   5. [0.995607] Slope
+   6. [0.995545] Isoelectric point
+   7. [0.995421] NS320xx
+   8. [0.995329] Common Object Request Broker Architecture
+   9. [0.995042] Relational model
+  10. [0.994382] Document management system
+
+Query: ['film', 'movie', 'director']
+   1. [0.999357] Film festival
+   2. [0.999195] Spain in Flames
+   3. [0.999194] The Return of Godzilla
+   4. [0.999192] Murat Ses
+   5. [0.999177] Alibi (1929 film)
+   6. [0.999161] The Psychedelic Furs
+   7. [0.999117] Mnemonics (album)
+   8. [0.999100] House music
+   9. [0.999093] Mustafa Altıoklar
+  10. [0.999082] Jean Hersholt Humanitarian Award
+
+Query: ['mathematics', 'algebra', 'geometry']
+   1. [0.998741] Associative algebra
+   2. [0.998495] Original equipment manufacturer
+   3. [0.998484] Axiom of pairing
+   4. [0.998201] Proteome
+   5. [0.998200] Pitch (music)
+   6. [0.998154] Bremsstrahlung
+   7. [0.998013] Hard science fiction
+   8. [0.997943] Firewall (construction)
+   9. [0.997932] Euler's formula
+  10. [0.997900] Ackermann function
 
 Observations:
-  - NLP vs Simple tokenizer differences: ___
-  - Quality of latent concepts: ___
+  - NLP vs Simple tokenizer differences:
+
+  NLP tokenizer (WordNet lemmatization) reduces inflected forms to their root — "armies"→"army", "running"→"run" — so related forms share the same vocabulary slot, producing a denser, semantically cleaner term-document matrix. Simple tokenizer treats "army" and "armies" as distinct terms, splitting signal across variants. The trade-off is speed: NLP takes ~3× longer for the tokenization phase (709s vs 242s at numFreq=5000, k=25), though the SVD cost at high k dominates both.
+
+  - Quality of latent concepts:
+
+  Query run with numFreq=5000, k=25
+
+  Quality is poor. Of the 25 concepts, roughly 15 are variations of the same theme: calendar and date articles (months 3–18 are almost all "September 1", "February 14", "July 20"… pages). Concept 4 is decade articles, concept 20 is US county disambiguation pages, concepts 23–24 are telecom stub articles. Only concepts 21 (Greek mythology) and 22 (surnames) show genuine topical coherence.
+
+ The root cause is the corpus composition — the 41,784-article Wikipedia dump is dominated by stub/disambiguation/calendar pages which form a tight cluster that absorbs most singular value mass, leaving only residual signal for real topics. Search results confirm this: "computer science" returns telecom stubs, "history ancient empire" returns Greek mythology stubs, "football soccer player" returns disease lists. Increasing k to 100+ would give the algorithm room to separate real topics from the calendar-page noise.
